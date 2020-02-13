@@ -1,6 +1,6 @@
 package controller.players;
 
-import actions.*;
+import moves.*;
 import model.GameState;
 import model.Player;
 import model.cards.card.Card;

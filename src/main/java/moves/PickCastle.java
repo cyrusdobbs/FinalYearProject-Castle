@@ -1,4 +1,4 @@
-package actions;
+package moves;
 
 import model.GameState;
 import model.cards.card.Card;
@@ -13,7 +13,7 @@ public class PickCastle extends CastleMove {
     }
 
     @Override
-    public void doAction(GameState gameState) {
+    public void doMove(GameState gameState) {
         gameState.getPlayers().get(player).getFaceUpCastleCards().addCards(cards);
         gameState.getPlayers().get(player).getHand().removeCards(cards);
         gameState.getPlayers().get(player).setHasPickedCastle(true);

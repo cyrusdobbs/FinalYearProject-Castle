@@ -1,4 +1,4 @@
-package actions;
+package moves;
 
 import model.GameState;
 
@@ -9,7 +9,7 @@ public class PickUp extends CastleMove {
     }
 
     @Override
-    public void doAction(GameState gameState) {
+    public void doMove(GameState gameState) {
         // Pick up discard pile
         gameState.getPlayers().get(player).getHand().addCards(gameState.getDiscardPile().pickUp());
     }

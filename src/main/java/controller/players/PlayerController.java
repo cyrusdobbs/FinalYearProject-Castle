@@ -1,6 +1,6 @@
 package controller.players;
 
-import actions.CastleMove;
+import moves.CastleMove;
 import model.GameState;
 import model.Player;
 

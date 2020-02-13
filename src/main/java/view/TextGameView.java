@@ -10,7 +10,7 @@ import java.util.List;
 public class TextGameView implements GameView{
 
     public void updateView(GameState gameState) {
-        System.out.println(gameState.getLastAction().toString());
+        System.out.println(gameState.getLastMove().toString());
         System.out.println("Current player: " + gameState.getPlayers().get(gameState.getCurrentPlayer()).getName());
         System.out.println("Deck preview:");
         System.out.println(gameState.getDeck().toString());

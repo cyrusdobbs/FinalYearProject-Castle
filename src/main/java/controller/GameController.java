@@ -3,7 +3,7 @@ package controller;
 import controller.players.IsmctsPlayerController;
 import controller.players.LowestPlayerController;
 import controller.players.PlayerController;
-import actions.*;
+import moves.*;
 import model.Player;
 import model.GameState;
 import view.GameView;
@@ -71,12 +71,12 @@ public class GameController {
     }
 
     // Needed
-    public void doMove(CastleMove action) {
-        action.doAction(gameState);
+    public void doMove(CastleMove move) {
+        move.doMove(gameState);
         // If a player burns the pile then they have another go
-        if (!action.burnsPile() && !gameState.isGameOver()) {
+        if (!move.burnsPile() && !gameState.isGameOver()) {
             gameState.setCurrentPlayer(gameState.getNextPlayer());
         }
-        gameState.setLastAction(action);
+        gameState.setLastMove(move);
     }
 }

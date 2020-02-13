@@ -1,7 +1,7 @@
 package controller.players;
 
 import model.GameState;
-import actions.CastleMove;
+import moves.CastleMove;
 
 import java.util.*;
 

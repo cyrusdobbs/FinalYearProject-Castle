@@ -1,7 +1,7 @@
 package controller.players;
 
 import controller.GameController;
-import actions.*;
+import moves.*;
 import model.cards.Deck;
 import model.cards.card.Card;
 import model.GameState;

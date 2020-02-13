@@ -1,6 +1,6 @@
 package model;
 
-import actions.*;
+import moves.*;
 import model.cards.Deck;
 import model.cards.DiscardPile;
 
@@ -16,7 +16,7 @@ public class GameState {
     private int castleSize;
     private int noOfPlayers;
     private boolean gameOver;
-    private CastleMove lastAction;
+    private CastleMove lastMove;
     private int winningPlayer;
 
     public GameState(List<Player> playerModels) {
@@ -33,7 +33,7 @@ public class GameState {
         castleSize = 3;
         noOfPlayers = playerModels.size();
         gameOver = false;
-        lastAction = null;
+        lastMove = null;
         winningPlayer = -1;
 
         // Deal castle
@@ -58,7 +58,7 @@ public class GameState {
         noOfPlayers = players.size();
         gameOver = false;
         currentPlayer = 0;
-        lastAction = null;
+        lastMove = null;
     }
 
     public GameState(Deck deck,
@@ -69,7 +69,7 @@ public class GameState {
                      int castleSize,
                      int noOfPlayers,
                      boolean gameOver,
-                     CastleMove lastAction) {
+                     CastleMove lastMove) {
         this.deck = deck;
         this.discardPile = discardPile;
         this.players = players;
@@ -78,7 +78,7 @@ public class GameState {
         this.castleSize = castleSize;
         this.noOfPlayers = noOfPlayers;
         this.gameOver = gameOver;
-        this.lastAction = lastAction;
+        this.lastMove = lastMove;
     }
 
     public int getResult(int playerJustMoved) {
@@ -125,16 +125,16 @@ public class GameState {
         this.currentPlayer = currentPlayer;
     }
 
-    public CastleMove getLastAction() {
-        return lastAction;
+    public CastleMove getLastMove() {
+        return lastMove;
     }
 
-    public void setLastAction(CastleMove lastAction) {
-        this.lastAction = lastAction;
+    public void setLastMove(CastleMove lastMove) {
+        this.lastMove = lastMove;
     }
 
     public GameState copy() {
-        return new GameState(new Deck(deck), new DiscardPile(discardPile), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastAction);
+        return new GameState(new Deck(deck), new DiscardPile(discardPile), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastMove);
     }
 
     private List<Player> copyPlayers() {

@@ -1,4 +1,4 @@
-package actions;
+package moves;
 
 import model.GameState;
 import model.cards.card.Card;
@@ -18,11 +18,11 @@ public class PlayHandCard extends PlayCard {
     }
 
     @Override
-    public void doAction(GameState gameState) {
+    public void doMove(GameState gameState) {
         // Remove model.cards.card from hand
         gameState.getPlayers().get(player).getHand().removeCards(cards);
         // Play model.cards.card
-        super.doAction(gameState);
+        super.doMove(gameState);
         // Take top deck
         if (!gameState.getDeck().isEmpty() && gameState.getPlayers().get(player).getHand().size() < gameState.getHandSize()) {
             pickUpTopDeck(gameState);

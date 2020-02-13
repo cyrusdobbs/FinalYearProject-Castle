@@ -1,4 +1,4 @@
-package actions;
+package moves;
 
 import model.GameState;
 import model.cards.card.Card;
@@ -17,7 +17,7 @@ public abstract class PlayCard extends CastleMove {
     }
 
     @Override
-    public void doAction(GameState gameState) {
+    public void doMove(GameState gameState) {
         // Play model.cards.card
         gameState.getDiscardPile().play(cards);
         isLastFourPlayedTheSame(gameState);

@@ -1,4 +1,4 @@
-package actions;
+package moves;
 
 import model.GameState;
 import model.cards.card.Card;
@@ -39,7 +39,7 @@ public abstract class CastleMove {
         return stringBuilder.toString();
     }
 
-    public abstract void doAction(GameState gameState);
+    public abstract void doMove(GameState gameState);
 
     public abstract String toString();
 }
