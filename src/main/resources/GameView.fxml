@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1025.0" prefWidth="1293.0" style="-fx-background-color: green;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="13.0" layoutY="14.0" prefHeight="411.0" prefWidth="1265.0" style="-fx-background-color: green;">
+         <children>
+            <ListView fx:id="opponentHand" nodeOrientation="LEFT_TO_RIGHT" orientation="HORIZONTAL" prefHeight="129.0" prefWidth="900.0" style="-fx-background-color: green;" stylesheets="@listStyle.css" />
+            <ListView fx:id="opponentFUCards" nodeOrientation="LEFT_TO_RIGHT" orientation="HORIZONTAL" prefHeight="129.0" prefWidth="900.0" style="-fx-background-color: green;" stylesheets="@listStyle.css" />
+            <ListView fx:id="opponentFDCards" nodeOrientation="LEFT_TO_RIGHT" orientation="HORIZONTAL" prefHeight="129.0" prefWidth="900.0" style="-fx-background-color: green;" stylesheets="@listStyle.css" />
+         </children>
+      </VBox>
+      <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="600.0" prefHeight="411.0" prefWidth="1265.0" style="-fx-background-color: green;">
+         <children>
+            <ListView fx:id="playerHand" nodeOrientation="LEFT_TO_RIGHT" orientation="HORIZONTAL" prefHeight="129.0" prefWidth="900.0" style="-fx-background-color: green;" stylesheets="@listStyle.css" />
+            <ListView fx:id="playerFUCards" nodeOrientation="LEFT_TO_RIGHT" orientation="HORIZONTAL" prefHeight="129.0" prefWidth="900.0" style="-fx-background-color: green;" stylesheets="@listStyle.css" />
+            <ListView fx:id="playerFDCards" nodeOrientation="LEFT_TO_RIGHT" orientation="HORIZONTAL" prefHeight="129.0" prefWidth="900.0" style="-fx-background-color: green;" stylesheets="@listStyle.css" />
+         </children>
+      </VBox>
+      <Rectangle fx:id="deck" arcHeight="5.0" arcWidth="5.0" fill="#5a95cd" height="120.0" layoutX="608.0" layoutY="437.0" stroke="BLACK" strokeType="INSIDE" width="78.0" />
+      <Pane layoutX="365.0" layoutY="437.0" prefHeight="115.0" prefWidth="76.0">
+         <children>
+            <Rectangle fx:id="discardPile" arcHeight="5.0" arcWidth="5.0" fill="#5a95cd" height="120.0" stroke="BLACK" strokeType="INSIDE" width="78.0" />
+            <Text layoutX="22.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Deck" />
+         </children>
+      </Pane>
+      <Button fx:id="playCardsButton" layoutX="936.0" layoutY="464.0" mnemonicParsing="false" prefHeight="67.0" prefWidth="182.0" text="Play Selected Cards" />
+      <Pane layoutX="75.0" layoutY="450.0" prefHeight="96.0" prefWidth="226.0">
+         <children>
+            <Text fx:id="textBox" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="226.0" />
+         </children>
+      </Pane>
+   </children>
+</Pane>

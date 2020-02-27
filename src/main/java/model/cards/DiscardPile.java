@@ -1,6 +1,8 @@
 package model.cards;
 
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import model.cards.card.Card;
 
 import java.util.ArrayList;
@@ -9,27 +11,27 @@ import java.util.Stack;
 
 public class DiscardPile {
 
-    private Stack<Card> playedPile;
+    private ObservableList<Card> playedPile;
 
     public DiscardPile() {
-        playedPile = new Stack<>();
+        playedPile = FXCollections.observableArrayList();
     }
 
     public DiscardPile(DiscardPile discardPile) {
-        this.playedPile = new Stack<>();
+        this.playedPile = FXCollections.observableArrayList();
         this.playedPile.addAll(discardPile.playedPile);
     }
 
     public Card getTopCard() {
-        if (playedPile.empty()) {
+        if (playedPile.isEmpty()) {
             return null;
         }
-        return playedPile.peek();
+        return playedPile.get(0);
     }
 
     public List<Card> pickUp() {
         List<Card> pileToReturn = new ArrayList<>(playedPile);
-        playedPile = new Stack<>();
+        playedPile = FXCollections.observableArrayList();
         return pileToReturn;
     }
 
@@ -45,11 +47,11 @@ public class DiscardPile {
 
     public void play(List<Card> playedCards) {
         for (Card card : playedCards) {
-            playedPile.push(card);
+            playedPile.add(0, card);
         }
     }
 
-    public Stack<Card> getPlayedPile() {
+    public List<Card> getPlayedPile() {
         return playedPile;
     }
 

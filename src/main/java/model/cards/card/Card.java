@@ -2,7 +2,7 @@ package model.cards.card;
 
 import javafx.scene.Parent;
 
-public class Card extends Parent {
+public class Card {
 
     private Rank rank;
     private Suit suit;

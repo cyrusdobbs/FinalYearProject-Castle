@@ -21,7 +21,7 @@ public abstract class CardCollection {
         cardCollection = cards;
     }
 
-    public List<Card> getCardCollection() {
+    public ObservableList<Card> getCardCollection() {
         return cardCollection;
     }
 

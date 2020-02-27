@@ -6,10 +6,10 @@ import java.util.Set;
 
 public enum Suit {
 
-    HEARTS (0, "h"),
-    DIAMONDS (1, "d"),
-    SPADES (2, "s"),
-    CLUBS (3, "c");
+    HEARTS (0, "H"),
+    DIAMONDS (1, "D"),
+    SPADES (2, "S"),
+    CLUBS (3, "C");
 
     private int suitCode;
     private String shortName;

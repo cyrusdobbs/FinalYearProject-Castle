@@ -1,5 +1,6 @@
 package model;
 
+import controller.ControllerConstants;
 import moves.*;
 import model.cards.Deck;
 import model.cards.DiscardPile;
@@ -151,5 +152,12 @@ public class GameState {
 
     public void setWinningPlayer(int winningPlayer) {
         this.winningPlayer = winningPlayer;
+    }
+
+    public SimpleGameState toSimpleGameState() {
+        return new SimpleGameState(players.get(ControllerConstants.AI_PLAYER).getHand(),
+                players.get(ControllerConstants.AI_PLAYER).getFaceUpCastleCards(),
+                players.get(ControllerConstants.LOWEST_PLAYER).getFaceUpCastleCards(),
+                discardPile.getTopCard());
     }
 }

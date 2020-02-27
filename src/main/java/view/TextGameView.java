@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TextGameView implements GameView{
+public class TextGameView implements GameView {
 
     public void updateView(GameState gameState) {
         System.out.println(gameState.getLastMove().toString());

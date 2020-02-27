@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class LowestPlayerController extends PlayerController {
+public class LowestPlayerController extends PlayerController implements AIController {
 
     public LowestPlayerController(Player playerModel) {
         super(playerModel);
@@ -19,7 +19,7 @@ public class LowestPlayerController extends PlayerController {
     public CastleMove getMove(GameState gameState) {
         if (!playerModel.hasPickedCastle()) {
             return pickCastle(gameState);
-        } else if (!playerModel.getHand().isEmpty()){
+        } else if (!playerModel.getHand().isEmpty()) {
             return pickCardToPlay(gameState);
         } else if (!playerModel.getFaceUpCastleCards().isEmpty()) {
             return pickFUCastleCardToPlay(gameState);
@@ -36,7 +36,7 @@ public class LowestPlayerController extends PlayerController {
                 cardsPlayed.add(card);
             } else if (!cardsPlayed.isEmpty() && cardsPlayed.get(0).getRank().getValueCode() == card.getRank().getValueCode()) {
                 cardsPlayed.add(card);
-            } else if (!cardsPlayed.isEmpty()){
+            } else if (!cardsPlayed.isEmpty()) {
                 break;
             }
         }
@@ -60,7 +60,7 @@ public class LowestPlayerController extends PlayerController {
                 cardsPlayed.add(card);
             } else if (!cardsPlayed.isEmpty() && cardsPlayed.get(0).getRank().getValueCode() == card.getRank().getValueCode()) {
                 cardsPlayed.add(card);
-            } else if (!cardsPlayed.isEmpty()){
+            } else if (!cardsPlayed.isEmpty()) {
                 break;
             }
         }

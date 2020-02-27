@@ -1,6 +1,6 @@
 package controller.players;
 
-import controller.GameController;
+import controller.TerminalGameController;
 import moves.*;
 import model.cards.Deck;
 import model.cards.card.Card;
@@ -10,7 +10,7 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.util.*;
 
-public class IsmctsPlayerController extends PlayerController {
+public class IsmctsPlayerController extends PlayerController implements AIController {
 
     private int maxIterations;
     private double exploration;
@@ -41,25 +41,24 @@ public class IsmctsPlayerController extends PlayerController {
 
             // Determinise
             GameState currentGameState = cloneAndRandomize(gameState);
-            GameController gameController = new GameController(currentGameState, null, null);
 
             // Select
             while (!getMoves(currentGameState).isEmpty() && node.getUntriedMoves(getMoves(currentGameState)).isEmpty()) {
                 node = node.UCBSelectChild(getMoves(currentGameState), exploration);
-                gameController.doMove(node.getMove());
+                doMove(node.getMove(), currentGameState);
             }
 
             // Expand
             if (!node.getUntriedMoves(getMoves(currentGameState)).isEmpty()) {
                 CastleMove move = getRandomMove(node.getUntriedMoves(getMoves(currentGameState)));
                 int player = currentGameState.getCurrentPlayer();
-                gameController.doMove(move);
+                doMove(move, currentGameState);
                 node.addChild(move, player);
             }
 
             // Simulate
             while (!getMoves(currentGameState).isEmpty()) {
-                gameController.doMove(getRandomMove(getMoves(currentGameState)));
+                doMove(getRandomMove(getMoves(currentGameState)), currentGameState);
             }
 
             // Backpropagate
@@ -79,6 +78,16 @@ public class IsmctsPlayerController extends PlayerController {
 
         CastleMove bestMoveFound = rootNode.getChildNodes().stream().max(Comparator.comparing(Node::getWins)).get().getMove();
         return bestMoveFound != null ? bestMoveFound : rootNode.getChildNodes().get(random.nextInt(rootNode.getChildNodes().size())).getMove();
+    }
+
+    // IF THIS CHANGES CHANGE IN TERMINAL CONTROLLER
+    private void doMove(CastleMove move, GameState gameState) {
+        move.doMove(gameState);
+        // If a player burns the pile then they have another go
+        if (!move.burnsPile() && !gameState.isGameOver()) {
+            gameState.setCurrentPlayer(gameState.getNextPlayer());
+        }
+        gameState.setLastMove(move);
     }
 
     private GameState cloneAndRandomize(GameState gameState) {
