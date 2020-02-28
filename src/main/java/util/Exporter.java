@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 public class Exporter {
 
     // 50,000 is for 30 minutes of games
-    private static final int ENTRIES_PER_FILE = 50000;
+    private static final int ENTRIES_PER_FILE = 2500;
     private static final char LIST_DELIMITER = '|';
     private static final String OUTPUT_FOLDER = "output/";
     private static final String TRUE = "1";
