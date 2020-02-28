@@ -2,12 +2,12 @@ package model;
 
 import java.util.List;
 
-public class Game {
+public class GameHistory {
 
     private List<SimpleGameState> gameStates;
     private boolean won;
 
-    public Game(List<SimpleGameState> gameStates, boolean won) {
+    public GameHistory(List<SimpleGameState> gameStates, boolean won) {
         this.gameStates = gameStates;
         this.won = won;
     }

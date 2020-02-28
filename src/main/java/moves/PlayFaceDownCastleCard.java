@@ -19,6 +19,9 @@ public class PlayFaceDownCastleCard extends PlayCard {
     @Override
     public void doMove(GameState gameState) {
         // If model.cards.card is valid it is played
+        if (gameState.getPlayers().get(player).getFaceDownCastleCards().getCardCollection().isEmpty()) {
+            int stop = 1;
+        }
         Card cardPicked = gameState.getPlayers().get(player).getFaceDownCastleCards().getCardCollection().get(cardPickedIndex);
         cards.add(cardPicked);
         if (cardPicked.isCardValid(gameState.getDiscardPile().getTopCard())) {

@@ -83,11 +83,15 @@ public class IsmctsPlayerController extends PlayerController implements AIContro
     // IF THIS CHANGES CHANGE IN TERMINAL CONTROLLER
     private void doMove(CastleMove move, GameState gameState) {
         move.doMove(gameState);
+        endTurn(move, gameState);
+        gameState.setLastMove(move);
+    }
+
+    private void endTurn(CastleMove move, GameState gameState) {
         // If a player burns the pile then they have another go
         if (!move.burnsPile() && !gameState.isGameOver()) {
             gameState.setCurrentPlayer(gameState.getNextPlayer());
         }
-        gameState.setLastMove(move);
     }
 
     private GameState cloneAndRandomize(GameState gameState) {

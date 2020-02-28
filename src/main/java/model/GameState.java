@@ -1,9 +1,9 @@
 package model;
 
-import controller.ControllerConstants;
 import moves.*;
 import model.cards.Deck;
 import model.cards.DiscardPile;
+import util.CastleConstants;
 
 import java.util.*;
 
@@ -50,6 +50,7 @@ public class GameState {
             }
         }
     }
+
     public GameState(Deck deck, DiscardPile discardPile, List<Player> players, int handSize, int castleSize) {
         this.deck = deck;
         this.discardPile = discardPile;
@@ -122,6 +123,28 @@ public class GameState {
         return currentPlayer;
     }
 
+    public String getCurrentPlayerType() {
+        return players.get(currentPlayer).getName();
+    }
+
+    public Player getAIPlayer() {
+        for (Player player : players) {
+            if (player.getName().equals(CastleConstants.ISMCTS)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public Player getLowestPlayer() {
+        for (Player player : players) {
+            if (player.getName().equals(CastleConstants.LOWEST)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public void setCurrentPlayer(int currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
@@ -155,9 +178,13 @@ public class GameState {
     }
 
     public SimpleGameState toSimpleGameState() {
-        return new SimpleGameState(players.get(ControllerConstants.AI_PLAYER).getHand(),
-                players.get(ControllerConstants.AI_PLAYER).getFaceUpCastleCards(),
-                players.get(ControllerConstants.LOWEST_PLAYER).getFaceUpCastleCards(),
-                discardPile.getTopCard());
+        return new SimpleGameState(getAIPlayer().getHand().copy(),
+                getAIPlayer().getFaceUpCastleCards().copy(),
+                getAIPlayer().getFaceDownCastleCards().size(),
+                getLowestPlayer().getHand().size(),
+                getLowestPlayer().getFaceUpCastleCards().copy(),
+                getLowestPlayer().getFaceDownCastleCards().size(),
+                discardPile.getTopCard(),
+                deck.isEmpty());
     }
 }
