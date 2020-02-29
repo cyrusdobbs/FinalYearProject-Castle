@@ -3,3 +3,4 @@
 build\
 gradle\
 output\
+.DS_Store

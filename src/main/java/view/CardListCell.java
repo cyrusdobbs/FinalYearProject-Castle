@@ -33,9 +33,9 @@ public class CardListCell extends ListCell<Card> {
         } else {
             Image image;
             if (hidden) {
-                image = new Image(getClass().getResource("/CardImagesNew/black_joker.svg").toExternalForm(), 76, 115, false, false);
+                image = new Image(getClass().getResource("/oldFiles/CardImagesNew/black_joker.svg").toExternalForm(), 76, 115, false, false);
             } else {
-                image = new Image(getClass().getResource("/CardImagesNew/" + card.toShortString() + ".svg").toExternalForm(), 76, 115, false, false);
+                image = new Image(getClass().getResource("/oldFiles/CardImagesNew/" + card.toShortString() + ".svg").toExternalForm(), 76, 115, false, false);
             }
             imageView.setImage(image);
             setGraphic(imageView);
