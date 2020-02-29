@@ -9,6 +9,7 @@ import model.cards.card.Card;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Exporter {
@@ -99,6 +100,7 @@ public class Exporter {
             csvWriter.close();
         }
 
+        Files.createDirectories(Paths.get(OUTPUT_FOLDER));
         Writer writer = Files.newBufferedWriter(Paths.get(OUTPUT_FOLDER + (summaryFile ? SUMMARY_FILE_NAME : fileName + fileCount) + CSV_EXT));
 
         csvWriter = new CSVWriter(writer,

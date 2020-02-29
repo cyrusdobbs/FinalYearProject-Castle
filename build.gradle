@@ -5,6 +5,13 @@ plugins {
 group 'Castle'
 version '1.0-SNAPSHOT'
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'util/Run'
+        )
+    }
+}
 sourceCompatibility = 1.8
 
 repositories {
