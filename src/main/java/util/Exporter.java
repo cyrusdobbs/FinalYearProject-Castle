@@ -9,7 +9,6 @@ import model.cards.card.Card;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Exporter {
@@ -30,26 +29,27 @@ public class Exporter {
 
     private String fileName;
     private int fileCount;
-    private int entryCount;
+    private int totalEntryCount;
+    private int currentEntryCount;
 
     public Exporter(String fileName) throws IOException {
         this.fileName = fileName;
         fileCount = 0;
-        entryCount = 0;
+        totalEntryCount = 0;
 
         newFile(false);
         csvWriter.writeNext(HEADER);
     }
 
     public void exportGame(GameHistory gameHistory) throws IOException {
-        if (entryCount > ENTRIES_PER_FILE) {
+        if (currentEntryCount > ENTRIES_PER_FILE) {
             newFile(false);
         }
 
         boolean AIWon = gameHistory.hasWon();
         for (SimpleGameState gameState : gameHistory.getGameStates()) {
             csvWriter.writeNext(gameStateToEntry(gameState, AIWon));
-            entryCount++;
+            currentEntryCount++;
         }
     }
 
@@ -100,10 +100,6 @@ public class Exporter {
             csvWriter.close();
         }
 
-        System.out.println("File Count: " + fileCount);
-        System.out.println("Entry Count: " + entryCount);
-        System.out.println("New file created.");
-
         Files.createDirectories(Paths.get(OUTPUT_FOLDER));
         Writer writer = Files.newBufferedWriter(Paths.get(OUTPUT_FOLDER + (summaryFile ? SUMMARY_FILE_NAME : fileName + fileCount) + CSV_EXT));
 
@@ -114,5 +110,18 @@ public class Exporter {
                 CSVWriter.DEFAULT_LINE_END);
 
         fileCount++;
+        totalEntryCount += currentEntryCount;
+        currentEntryCount = 0;
+
+        System.out.println("----------------------------");
+        if (!summaryFile) {
+            if (fileCount != 1) {
+                System.out.println("File Count: " + fileCount);
+                System.out.println("Entry Count: " + totalEntryCount);
+            }
+            System.out.println("New file created.");
+        } else {
+            System.out.println("Summary file created.");
+        }
     }
 }
