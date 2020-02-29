@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class Exporter {
+class Exporter {
 
     // 50,000 is for 30 minutes of games
     private static final int ENTRIES_PER_FILE = 2500;
@@ -32,16 +35,18 @@ public class Exporter {
     private int totalEntryCount;
     private int currentEntryCount;
 
-    public Exporter(String fileName) throws IOException {
+    Exporter(String fileName) throws IOException {
         this.fileName = fileName;
         fileCount = 0;
         totalEntryCount = 0;
+        currentEntryCount = 0;
 
+        // Initiate file
         newFile(false);
         csvWriter.writeNext(HEADER);
     }
 
-    public void exportGame(GameHistory gameHistory) throws IOException {
+    void exportGame(GameHistory gameHistory) throws IOException {
         if (currentEntryCount > ENTRIES_PER_FILE) {
             newFile(false);
         }
@@ -53,7 +58,7 @@ public class Exporter {
         }
     }
 
-    public void writeSummary(long timeElapsed, int gamesPlayed, int aiWins, int lowestWins, int iterations) throws IOException {
+    void writeSummary(long timeElapsed, int gamesPlayed, int aiWins, int lowestWins, int iterations) throws IOException {
         newFile(true);
         csvWriter.writeNext(new String[]{"AVERAGE_GAME_TIME_SECS", "TIME_ELAPSED_SECS", "TIME_ELAPSED_MINUTES", "TIME_ELAPSED_HOURS", "TOTAL_GAMES", "AI_WINS", "LOWEST_WINS", "AI_ITERATIONS"});
         csvWriter.writeNext(new String[]{gamesPlayed > 0 ? String.valueOf(timeElapsed / CastleConstants.SECOND_TO_MS / gamesPlayed) : "0",
@@ -66,7 +71,7 @@ public class Exporter {
                 String.valueOf(iterations)});
     }
 
-    public void close() throws IOException {
+    void close() throws IOException {
         csvWriter.close();
     }
 
@@ -113,9 +118,9 @@ public class Exporter {
         totalEntryCount += currentEntryCount;
         currentEntryCount = 0;
 
-        System.out.println("----------------------------");
+        System.out.println("--------------" + getCurrentTime() + "--------------");
         if (!summaryFile) {
-            if (fileCount != 1) {
+            if (fileCount > 1) {
                 System.out.println("File Count: " + fileCount);
                 System.out.println("Entry Count: " + totalEntryCount);
             }
@@ -123,5 +128,11 @@ public class Exporter {
         } else {
             System.out.println("Summary file created.");
         }
+    }
+
+    private String getCurrentTime() {
+        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+        Date date = new Date();
+        return df.format(date);
     }
 }
