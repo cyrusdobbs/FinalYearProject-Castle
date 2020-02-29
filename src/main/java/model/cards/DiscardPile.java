@@ -1,24 +1,20 @@
 package model.cards;
 
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.cards.card.Card;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class DiscardPile {
 
-    private ObservableList<Card> playedPile;
+    private List<Card> playedPile;
 
     public DiscardPile() {
-        playedPile = FXCollections.observableArrayList();
+        playedPile = new ArrayList<>();
     }
 
     public DiscardPile(DiscardPile discardPile) {
-        this.playedPile = FXCollections.observableArrayList();
+        this.playedPile = new ArrayList<>();
         this.playedPile.addAll(discardPile.playedPile);
     }
 
@@ -31,7 +27,7 @@ public class DiscardPile {
 
     public List<Card> pickUp() {
         List<Card> pileToReturn = new ArrayList<>(playedPile);
-        playedPile = FXCollections.observableArrayList();
+        playedPile = new ArrayList<>();
         return pileToReturn;
     }
 

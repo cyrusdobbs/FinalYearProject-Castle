@@ -1,7 +1,5 @@
 package model.cards.card;
 
-import javafx.scene.Parent;
-
 public class Card {
 
     private Rank rank;

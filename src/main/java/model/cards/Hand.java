@@ -1,17 +1,16 @@
 package model.cards;
 
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.cards.card.Card;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class Hand extends CardCollection {
 
     public Hand() {
     }
 
-    public Hand(ObservableList<Card> cards) {
+    public Hand(List<Card> cards) {
         super(cards);
     }
 
@@ -21,16 +20,8 @@ public class Hand extends CardCollection {
         super.printOptions(offerPickup, hidden);
     }
 
-//    public Hand copy() {
-//        List<Card> newCollection = new ArrayList<>();
-//        for (Card model.cards.card : getCardCollection()) {
-//            newCollection.add(new Card(model.cards.card));
-//        }
-//        return new Hand(newCollection);
-//    }
-
     public Hand copy() {
-        ObservableList<Card> newCollection = FXCollections.observableArrayList(getCardCollection());
+        List<Card> newCollection = new ArrayList<>(getCardCollection());
         return new Hand(newCollection);
     }
 

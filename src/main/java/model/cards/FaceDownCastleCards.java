@@ -1,8 +1,9 @@
 package model.cards;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.cards.card.Card;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FaceDownCastleCards extends CastleCards {
 
@@ -10,7 +11,7 @@ public class FaceDownCastleCards extends CastleCards {
         super();
     }
 
-    private FaceDownCastleCards(ObservableList<Card> cards) {
+    private FaceDownCastleCards(List<Card> cards) {
         super(cards);
     }
 
@@ -21,7 +22,7 @@ public class FaceDownCastleCards extends CastleCards {
     }
 
     public FaceDownCastleCards copy() {
-        ObservableList<Card> newCollection = FXCollections.observableArrayList(getCardCollection());
+        List<Card> newCollection = new ArrayList<>(getCardCollection());
         return new FaceDownCastleCards(newCollection);
     }
 }

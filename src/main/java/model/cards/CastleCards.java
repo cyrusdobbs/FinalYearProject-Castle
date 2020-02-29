@@ -1,8 +1,8 @@
 package model.cards;
 
-
-import javafx.collections.ObservableList;
 import model.cards.card.Card;
+
+import java.util.List;
 
 abstract class CastleCards extends CardCollection {
 
@@ -10,7 +10,7 @@ abstract class CastleCards extends CardCollection {
         super();
     }
 
-    public CastleCards(ObservableList<Card> cards) {
+    public CastleCards(List<Card> cards) {
         super(cards);
     }
 }

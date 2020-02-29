@@ -1,8 +1,6 @@
 package model.cards;
 
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.cards.card.Card;
 
 import java.util.*;
@@ -11,17 +9,17 @@ import java.util.stream.Collectors;
 
 public abstract class CardCollection {
 
-    private ObservableList<Card> cardCollection;
+    private List<Card> cardCollection;
 
     CardCollection() {
-        cardCollection = FXCollections.observableArrayList();
+        cardCollection = new ArrayList<>();
     }
 
-    CardCollection(ObservableList<Card> cards) {
+    CardCollection(List<Card> cards) {
         cardCollection = cards;
     }
 
-    public ObservableList<Card> getCardCollection() {
+    public List<Card> getCardCollection() {
         return cardCollection;
     }
 
@@ -56,7 +54,7 @@ public abstract class CardCollection {
             string.append(card.toShortString()).append(", ");
         }
         if (string.length() > 1) {
-            string.setLength(string.length()-2);
+            string.setLength(string.length() - 2);
         }
         return string.toString();
     }
@@ -67,7 +65,7 @@ public abstract class CardCollection {
             string.append("X").append(", ");
         }
         if (string.length() > 1) {
-            string.setLength(string.length()-2);
+            string.setLength(string.length() - 2);
         }
         return string.toString();
     }
@@ -89,7 +87,7 @@ public abstract class CardCollection {
     }
 
     public void replaceWithUnseenCards(List<Card> unseenCards) {
-        ObservableList<Card> newCardCollection = FXCollections.observableArrayList();
+        List<Card> newCardCollection = new ArrayList<>();
         for (int i = 0; i < size(); i++) {
             newCardCollection.add(unseenCards.remove(0));
         }
