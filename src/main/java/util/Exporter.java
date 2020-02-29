@@ -100,6 +100,10 @@ public class Exporter {
             csvWriter.close();
         }
 
+        System.out.println("File Count: " + fileCount);
+        System.out.println("Entry Count: " + entryCount);
+        System.out.println("New file created.");
+
         Files.createDirectories(Paths.get(OUTPUT_FOLDER));
         Writer writer = Files.newBufferedWriter(Paths.get(OUTPUT_FOLDER + (summaryFile ? SUMMARY_FILE_NAME : fileName + fileCount) + CSV_EXT));
 
