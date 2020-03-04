@@ -84,6 +84,7 @@ public class Run {
 
             if (gamesPlayed % GAMES_PER_EXPORT == 0) {
                 export(gameHistories);
+                gameHistories.clear();
             }
         }
 

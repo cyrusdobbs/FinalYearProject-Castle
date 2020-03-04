@@ -116,27 +116,4 @@ public class SQLExporter {
         }
         return aiWins;
     }
-
-//    private void update(int totalGames, int aiWins, int lowestWins) {
-//        Statement updateStatement = null;
-//        try {
-//            updateStatement = connection.createStatement();
-//
-//            updateStatement.execute("UPDATE Summary SET " +
-//                    "TOTAL_GAMES =" + totalGames
-//                    + ", AI_WINS =" + aiWins
-//                    + ", LOWEST_WINS =" + lowestWins);
-//
-//            System.out.println("Summary table updated.");
-//        } catch (SQLException ex) {
-//            System.out.println("SQLException: " + ex.getMessage());
-//        } finally {
-//            if (updateStatement != null) {
-//                try {
-//                    updateStatement.close();
-//                } catch (SQLException sqlEx) { /* ignore */ }
-//                updateStatement = null;
-//            }
-//        }
-//    }
 }

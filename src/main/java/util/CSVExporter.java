@@ -17,7 +17,7 @@ import java.util.List;
 
 class CSVExporter {
 
-    // 50,000 is for 30 minutes of games
+    // 2500 is for ~35 minutes of games at 3200 MCTS iterations
     private static final int ENTRIES_PER_FILE = 2500;
     private static final String OUTPUT_FOLDER = "output/";
     private static final String[] HEADER = {"HAND", "CASTLE_FU", "CASTLE_FD_SIZE", "OP_HAND_SIZE", "OP_CASTLE_FU", "OP_CASTLE_FD_SIZE", "TOP", "DECK_EMPTY", "WON"};
@@ -43,6 +43,7 @@ class CSVExporter {
         for (GameHistory gameHistory : gameHistories) {
             exportGame(gameHistory);
         }
+        System.out.println(getCurrentTime() + ": " + gameHistories.size() + " games output to CSV.");
     }
 
     void exportGame(GameHistory gameHistory) throws IOException {
@@ -121,7 +122,6 @@ class CSVExporter {
         totalEntryCount += currentEntryCount;
         currentEntryCount = 0;
 
-        System.out.println("--------------" + getCurrentTime() + "--------------");
         if (!summaryFile) {
             System.out.println(getCurrentTime() + ": New entry file created. " + fileCount + " files containing " + totalEntryCount + " entries.");
         } else {
