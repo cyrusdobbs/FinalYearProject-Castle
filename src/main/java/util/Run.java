@@ -7,7 +7,7 @@ import controller.players.LowestPlayerController;
 import model.GameHistory;
 import model.GameState;
 import model.Player;
-import sqlexporter.SQLExporter;
+import util.sqlexporter.SQLExporter;
 import view.TextGameView;
 
 import java.io.IOException;

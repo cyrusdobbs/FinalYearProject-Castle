@@ -1,4 +1,4 @@
-package sqlexporter;
+package util.sqlexporter;
 
 
 public class Entry {

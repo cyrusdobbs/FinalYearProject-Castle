@@ -1,4 +1,4 @@
-package sqlexporter;
+package util.sqlexporter;
 
 import model.GameHistory;
 import model.SimpleGameState;

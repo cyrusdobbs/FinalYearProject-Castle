@@ -4,7 +4,7 @@ import model.cards.CardCollection;
 import model.cards.FaceUpCastleCards;
 import model.cards.Hand;
 import model.cards.card.Card;
-import sqlexporter.Entry;
+import util.sqlexporter.Entry;
 import util.CastleConstants;
 
 import java.util.Arrays;
