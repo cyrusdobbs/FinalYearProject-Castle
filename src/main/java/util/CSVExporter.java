@@ -32,15 +32,11 @@ class CSVExporter {
     private int totalEntryCount;
     private int currentEntryCount;
 
-    CSVExporter(String fileName) throws IOException {
+    CSVExporter(String fileName) {
         this.fileName = fileName;
         fileCount = 0;
         totalEntryCount = 0;
         currentEntryCount = 0;
-
-        // Initiate file
-        newFile(false);
-        csvWriter.writeNext(HEADER);
     }
 
     void exportGames(List<GameHistory> gameHistories) throws IOException {
@@ -48,8 +44,13 @@ class CSVExporter {
             exportGame(gameHistory);
         }
     }
+
     void exportGame(GameHistory gameHistory) throws IOException {
-        if (currentEntryCount > ENTRIES_PER_FILE) {
+        if (fileCount == 0) {
+            // Initiate file
+            newFile(false);
+            csvWriter.writeNext(HEADER);
+        } else if (currentEntryCount > ENTRIES_PER_FILE) {
             newFile(false);
         }
 
@@ -122,11 +123,7 @@ class CSVExporter {
 
         System.out.println("--------------" + getCurrentTime() + "--------------");
         if (!summaryFile) {
-            if (fileCount > 1) {
-                System.out.println("File Count: " + fileCount);
-                System.out.println("Entry Count: " + totalEntryCount);
-            }
-            System.out.println("New file created.");
+            System.out.println(getCurrentTime() + ": New entry file created. " + fileCount + " files containing " + totalEntryCount + " entries.");
         } else {
             System.out.println("Summary file created.");
         }

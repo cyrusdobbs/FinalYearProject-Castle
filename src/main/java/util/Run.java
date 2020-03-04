@@ -8,12 +8,14 @@ import model.GameHistory;
 import model.GameState;
 import model.Player;
 import sqlexporter.SQLExporter;
-import sqlexporter.Summary;
 import view.TextGameView;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -25,14 +27,14 @@ public class Run {
     private static final String TIME = "T";
     private static final String GAMES = "G";
     private static final String YES = "Y";
-    public static final String FILE_NAME_PREFIX = "ISMCTS_";
-    public static final int MAX_ITERATIONS = 3200;
-    public static final int GAMES_PER_EXPORT = 10;
+    private static final String FILE_NAME_PREFIX = "ISMCTS_";
+    private static final int MAX_ITERATIONS = 3200;
+    private static final int GAMES_PER_EXPORT = 10;
 
     private static Random random = new Random();
 
     private static boolean print;
-    private static boolean exportToCsv;
+    private static boolean uploadToDatabase;
 
     private static CSVExporter CSVExporter;
     private static SQLExporter SQLExporter;
@@ -50,9 +52,11 @@ public class Run {
         String endConditionType = args[0];
         int endCondition = Integer.parseInt(args[1]);
         print = args[2].equals(YES);
-        exportToCsv = args[3].equals(YES);
+        uploadToDatabase = args[3].equals(YES);
         CSVExporter = new CSVExporter(FILE_NAME_PREFIX);
-        SQLExporter = new SQLExporter();
+        if (uploadToDatabase) {
+            SQLExporter = new SQLExporter();
+        }
 
         if (endConditionType.equals(TIME)) {
             runUntilTime(endCondition);
@@ -60,10 +64,10 @@ public class Run {
             runUntilNoOfGames(endCondition);
         }
 
-        if (exportToCsv) {
-            CSVExporter.writeSummary(timeElapsed, gamesPlayed, aiWins, lowestWins, MAX_ITERATIONS);
-        } else {
+        if (uploadToDatabase) {
             CSVExporter.writeSummary(timeElapsed, failedUpload_gamesPlayed, failedUpload_aiWins, failedUpload_lowestWins, MAX_ITERATIONS);
+        } else {
+            CSVExporter.writeSummary(timeElapsed, gamesPlayed, aiWins, lowestWins, MAX_ITERATIONS);
         }
         CSVExporter.close();
     }
@@ -148,22 +152,23 @@ public class Run {
     }
 
     private static void export(List<GameHistory> gameHistories) throws IOException {
-        int noOfAiWins = countAiWins(gameHistories);
-        if (exportToCsv) {
-            CSVExporter.exportGames(gameHistories);
-        } else {
+        if (uploadToDatabase) {
             try {
-                SQLExporter.exportGames(gameHistories);
+                SQLExporter.updateDatabase(gameHistories);
+                System.out.println(getCurrentTime() + ": Successfully uploaded " + gameHistories.size() + " games to the database.");
             } catch (SQLException e) {
-                System.out.println("SQLException: " + e.getMessage());
-                System.out.println("Exported as CSV instead.");
+                int noOfAiWins = countAiWins(gameHistories);
+                String time = getCurrentTime();
+                System.out.println(time + ": SQLException: " + e.getMessage());
+                System.out.println(time + ": Exported as CSV instead.");
                 // Export to CSV if DB fails
                 CSVExporter.exportGames(gameHistories);
                 failedUpload_gamesPlayed += gameHistories.size();
                 failedUpload_aiWins += noOfAiWins;
                 failedUpload_lowestWins += gameHistories.size() - noOfAiWins;
             }
-            SQLExporter.updateSummary(new Summary(gameHistories.size(), noOfAiWins, gameHistories.size() - noOfAiWins));
+        } else {
+            CSVExporter.exportGames(gameHistories);
         }
     }
 
@@ -175,5 +180,11 @@ public class Run {
             }
         }
         return aiWins;
+    }
+
+    private static String getCurrentTime() {
+        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+        Date date = new Date();
+        return df.format(date);
     }
 }
