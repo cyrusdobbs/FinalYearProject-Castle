@@ -7,9 +7,12 @@ import controller.players.LowestPlayerController;
 import model.GameHistory;
 import model.GameState;
 import model.Player;
+import sqlexporter.SQLExporter;
+import sqlexporter.Summary;
 import view.TextGameView;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,24 +27,32 @@ public class Run {
     private static final String YES = "Y";
     public static final String FILE_NAME_PREFIX = "ISMCTS_";
     public static final int MAX_ITERATIONS = 3200;
+    public static final int GAMES_PER_EXPORT = 10;
 
     private static Random random = new Random();
 
     private static boolean print;
     private static boolean exportToCsv;
 
-    private static Exporter exporter;
+    private static CSVExporter CSVExporter;
+    private static SQLExporter SQLExporter;
     private static long timeElapsed;
+
     private static int gamesPlayed;
-    private static int AIWins;
-    private static int LowestWins;
+    private static int aiWins;
+    private static int lowestWins;
+
+    private static int failedUpload_gamesPlayed;
+    private static int failedUpload_aiWins;
+    private static int failedUpload_lowestWins;
 
     public static void main(String[] args) throws IOException {
         String endConditionType = args[0];
         int endCondition = Integer.parseInt(args[1]);
         print = args[2].equals(YES);
         exportToCsv = args[3].equals(YES);
-        exporter = new Exporter(FILE_NAME_PREFIX);
+        CSVExporter = new CSVExporter(FILE_NAME_PREFIX);
+        SQLExporter = new SQLExporter();
 
         if (endConditionType.equals(TIME)) {
             runUntilTime(endCondition);
@@ -49,45 +60,70 @@ public class Run {
             runUntilNoOfGames(endCondition);
         }
 
-        exporter.writeSummary(timeElapsed, gamesPlayed, AIWins, LowestWins, MAX_ITERATIONS);
-        exporter.close();
+        if (exportToCsv) {
+            CSVExporter.writeSummary(timeElapsed, gamesPlayed, aiWins, lowestWins, MAX_ITERATIONS);
+        } else {
+            CSVExporter.writeSummary(timeElapsed, failedUpload_gamesPlayed, failedUpload_aiWins, failedUpload_lowestWins, MAX_ITERATIONS);
+        }
+        CSVExporter.close();
     }
 
     private static void runUntilNoOfGames(int endCondition) throws IOException {
         long startTime = System.currentTimeMillis();
 
+        List<GameHistory> gameHistories = new ArrayList<>();
         for (int i = 0; i < endCondition; i++) {
-            runGame();
+
+            GameHistory gameHistory = runGame();
+            gamesPlayed++;
+            gameHistories.add(gameHistory);
+
+            if (gamesPlayed % GAMES_PER_EXPORT == 0) {
+                export(gameHistories);
+            }
+        }
+
+        if (!gameHistories.isEmpty()) {
+            export(gameHistories);
         }
 
         timeElapsed = System.currentTimeMillis() - startTime;
-        gamesPlayed = endCondition;
     }
 
     private static void runUntilTime(int endCondition) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + (endCondition * CastleConstants.MINUTE_TO_MS);
-        gamesPlayed = 0;
 
+        List<GameHistory> gameHistories = new ArrayList<>();
         while (System.currentTimeMillis() < endTime) {
-            runGame();
+
+            GameHistory gameHistory = runGame();
             gamesPlayed++;
+            gameHistories.add(gameHistory);
+
+            if (gamesPlayed % GAMES_PER_EXPORT == 0) {
+                export(gameHistories);
+                gameHistories.clear();
+            }
+        }
+
+        if (!gameHistories.isEmpty()) {
+            export(gameHistories);
         }
 
         timeElapsed = endCondition * CastleConstants.MINUTE_TO_MS;
     }
 
-    private static void runGame() throws IOException {
+    private static GameHistory runGame() {
         TerminalGameController game = getNewGame();
         GameHistory gameHistory = game.run(print);
-        if (exportToCsv) {
-            exporter.exportGame(gameHistory);
-            if (gameHistory.hasWon()) {
-                AIWins++;
-            } else {
-                LowestWins++;
-            }
+
+        if (gameHistory.hasWon()) {
+            aiWins++;
+        } else {
+            lowestWins++;
         }
+        return gameHistory;
     }
 
     private static TerminalGameController getNewGame() {
@@ -109,5 +145,35 @@ public class Run {
 //        }
 
         return new TerminalGameController(new GameState(playerModels), new TextGameView(), players);
+    }
+
+    private static void export(List<GameHistory> gameHistories) throws IOException {
+        int noOfAiWins = countAiWins(gameHistories);
+        if (exportToCsv) {
+            CSVExporter.exportGames(gameHistories);
+        } else {
+            try {
+                SQLExporter.exportGames(gameHistories);
+            } catch (SQLException e) {
+                System.out.println("SQLException: " + e.getMessage());
+                System.out.println("Exported as CSV instead.");
+                // Export to CSV if DB fails
+                CSVExporter.exportGames(gameHistories);
+                failedUpload_gamesPlayed += gameHistories.size();
+                failedUpload_aiWins += noOfAiWins;
+                failedUpload_lowestWins += gameHistories.size() - noOfAiWins;
+            }
+            SQLExporter.updateSummary(new Summary(gameHistories.size(), noOfAiWins, gameHistories.size() - noOfAiWins));
+        }
+    }
+
+    private static int countAiWins(List<GameHistory> gameHistories) {
+        int aiWins = 0;
+        for (GameHistory gameHistory : gameHistories) {
+            if (gameHistory.hasWon()) {
+                aiWins++;
+            }
+        }
+        return aiWins;
     }
 }

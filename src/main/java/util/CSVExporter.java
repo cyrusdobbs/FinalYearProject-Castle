@@ -13,18 +13,15 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-class Exporter {
+class CSVExporter {
 
     // 50,000 is for 30 minutes of games
     private static final int ENTRIES_PER_FILE = 2500;
-    private static final char LIST_DELIMITER = '|';
     private static final String OUTPUT_FOLDER = "output/";
-    private static final String TRUE = "1";
-    private static final String FALSE = "0";
     private static final String[] HEADER = {"HAND", "CASTLE_FU", "CASTLE_FD_SIZE", "OP_HAND_SIZE", "OP_CASTLE_FU", "OP_CASTLE_FD_SIZE", "TOP", "DECK_EMPTY", "WON"};
     private static final String NA = "NA";
-    private static final String NO_CARDS = "";
     private static final String SUMMARY_FILE_NAME = "Summary";
     private static final String CSV_EXT = ".csv";
 
@@ -35,7 +32,7 @@ class Exporter {
     private int totalEntryCount;
     private int currentEntryCount;
 
-    Exporter(String fileName) throws IOException {
+    CSVExporter(String fileName) throws IOException {
         this.fileName = fileName;
         fileCount = 0;
         totalEntryCount = 0;
@@ -46,6 +43,11 @@ class Exporter {
         csvWriter.writeNext(HEADER);
     }
 
+    void exportGames(List<GameHistory> gameHistories) throws IOException {
+        for (GameHistory gameHistory : gameHistories) {
+            exportGame(gameHistory);
+        }
+    }
     void exportGame(GameHistory gameHistory) throws IOException {
         if (currentEntryCount > ENTRIES_PER_FILE) {
             newFile(false);
@@ -82,19 +84,19 @@ class Exporter {
         String opHandSize = String.valueOf(gameState.getOpHandSize());
         String opCastleFU = cardsToString(gameState.getOpCastleFU());
         String opCastleFDSize = String.valueOf(gameState.getOpCastleFDSize());
-        String topCard = gameState.getTopCard() == null ? NO_CARDS : String.valueOf(gameState.getTopCard().getRank().getValueCode());
-        String deckEmpty = gameState.isDeckEmpty() ? TRUE : FALSE;
-        return new String[]{hand, castleFU, castleFDSize, opHandSize, opCastleFU, opCastleFDSize, topCard, deckEmpty, won ? TRUE : FALSE};
+        String topCard = gameState.getTopCard() == null ? CastleConstants.NO_CARDS : String.valueOf(gameState.getTopCard().getRank().getValueCode());
+        String deckEmpty = gameState.isDeckEmpty() ? CastleConstants.TRUE : CastleConstants.FALSE;
+        return new String[]{hand, castleFU, castleFDSize, opHandSize, opCastleFU, opCastleFDSize, topCard, deckEmpty, won ? CastleConstants.TRUE : CastleConstants.FALSE};
     }
 
     private String cardsToString(CardCollection cards) {
         if (cards.isEmpty()) {
-            return NO_CARDS;
+            return CastleConstants.NO_CARDS;
         }
 
         StringBuilder stringBuilder = new StringBuilder();
         for (Card card : cards.getCardCollection()) {
-            stringBuilder.append(card.getRank().getValueCode()).append(LIST_DELIMITER);
+            stringBuilder.append(card.getRank().getValueCode()).append(CastleConstants.LIST_DELIMITER);
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         return stringBuilder.toString();
