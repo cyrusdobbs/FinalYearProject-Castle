@@ -7,6 +7,8 @@ import controller.players.LowestPlayerController;
 import model.GameHistory;
 import model.GameState;
 import model.Player;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import util.sqlexporter.SQLExporter;
 import view.TextGameView;
 
@@ -48,7 +50,10 @@ public class Run {
     private static int failedUpload_aiWins;
     private static int failedUpload_lowestWins;
 
+    private static Logger logger = LogManager.getLogger(Run.class);
+
     public static void main(String[] args) throws IOException {
+        logger.info("Application started.");
         String endConditionType = args[0];
         int endCondition = Integer.parseInt(args[1]);
         print = args[2].equals(YES);
@@ -66,10 +71,13 @@ public class Run {
 
         if (uploadToDatabase) {
             CSVExporter.writeSummary(timeElapsed, failedUpload_gamesPlayed, failedUpload_aiWins, failedUpload_lowestWins, MAX_ITERATIONS);
+            logger.info("Failed SQL upload summary written.");
         } else {
             CSVExporter.writeSummary(timeElapsed, gamesPlayed, aiWins, lowestWins, MAX_ITERATIONS);
+            logger.info("Summary written.");
         }
         CSVExporter.close();
+        logger.info("Application finished.");
     }
 
     private static void runUntilNoOfGames(int endCondition) throws IOException {
@@ -120,6 +128,7 @@ public class Run {
     }
 
     private static GameHistory runGame() {
+        logger.info("New game.");
         TerminalGameController game = getNewGame();
         GameHistory gameHistory = game.run(print);
 
@@ -128,6 +137,7 @@ public class Run {
         } else {
             lowestWins++;
         }
+        logger.info("Game finished.");
         return gameHistory;
     }
 
@@ -153,10 +163,12 @@ public class Run {
     }
 
     private static void export(List<GameHistory> gameHistories) throws IOException {
+        logger.info("Attempting to export.");
         if (uploadToDatabase) {
             try {
                 SQLExporter.updateDatabase(gameHistories);
                 System.out.println(getCurrentTime() + ": Successfully uploaded " + gameHistories.size() + " games to the database.");
+                logger.info("Games exported to DB.");
             } catch (SQLException e) {
                 int noOfAiWins = countAiWins(gameHistories);
                 String time = getCurrentTime();
@@ -167,9 +179,11 @@ public class Run {
                 failedUpload_gamesPlayed += gameHistories.size();
                 failedUpload_aiWins += noOfAiWins;
                 failedUpload_lowestWins += gameHistories.size() - noOfAiWins;
+                logger.info("DB export failed, exported to CSV.");
             }
         } else {
             CSVExporter.exportGames(gameHistories);
+            logger.info("Games exported to CSV.");
         }
     }
 
