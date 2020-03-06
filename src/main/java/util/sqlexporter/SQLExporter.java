@@ -11,7 +11,7 @@ public class SQLExporter {
 
     private static final String USERNAME = "c1529854";
     private static final String PASSWORD = "gihoadyod4";
-    private static final String CONNECTION = "jdbc:mysql://csmysql.cs.cf.ac.uk/c1529854";
+    private static final String CONNECTION = "jdbc:mysql://csmysql.cs.cf.ac.uk/c1529854?autoReconnect=true";
 
     private static final String SUMMARY_TEST = "Summary_Test";
     private static final String SUMMARY = "Summary";
