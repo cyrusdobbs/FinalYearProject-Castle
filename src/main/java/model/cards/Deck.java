@@ -72,7 +72,7 @@ public class Deck {
     @Override
     public String toString() {
         if (deck.empty()) {
-           return "EMPTY";
+            return "EMPTY";
         }
 
         StringBuilder string = new StringBuilder();
@@ -80,9 +80,19 @@ public class Deck {
             string.append(card.toShortString()).append(", ");
         }
         if (string.length() > 1) {
-            string.setLength(string.length()-2);
+            string.setLength(string.length() - 2);
             string.append(" ");
         }
         return string.toString();
     }
+
+    public void updateCount(int[] counts) {
+        for (Object ob : deck.toArray()) {
+            Card card = (Card) ob;
+            counts[card.getRank().getValueCode() - 2]++;
+        }
+    }
 }
+
+
+

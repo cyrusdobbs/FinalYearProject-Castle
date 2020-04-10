@@ -1,6 +1,5 @@
-package controller.players;
+package controller.players.ismcts;
 
-import model.GameState;
 import moves.CastleMove;
 
 import java.util.*;
@@ -60,7 +59,7 @@ public class Node {
     List<CastleMove> getUntriedMoves(List<CastleMove> legalMoves) {
         List<CastleMove> triedMoves = new ArrayList<>();
         for (Node childNode : childNodes) {
-            triedMoves.add(childNode.move);
+            triedMoves.add(childNode.getMove());
         }
         List<CastleMove> untriedMoves = new ArrayList<>();
         for (CastleMove castleMove : legalMoves) {
@@ -75,7 +74,7 @@ public class Node {
     Node UCBSelectChild(List<CastleMove> legalMoves, double exploration) {
         List<Node> legalChildNodes = new ArrayList<>();
         for (Node childNode : childNodes) {
-            if (containsMove(legalMoves, childNode.move)) {
+            if (containsMove(legalMoves, childNode.getMove())) {
                 legalChildNodes.add(childNode);
                 childNode.avails++;
             }
@@ -96,10 +95,10 @@ public class Node {
         childNodes.add(new Node(move, this, player));
     }
 
-    void update(GameState gameState) {
+    void update(int winningPlayer) {
         visits += 1;
-        if (playerJustMoved != -1) {
-            wins += gameState.getResult(playerJustMoved);
+        if (playerJustMoved == winningPlayer) {
+            wins ++;
         }
     }
 

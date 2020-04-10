@@ -54,4 +54,10 @@ public class DiscardPile {
     public void burn() {
         playedPile.clear();
     }
+
+    public void updateCounts(int[] counts) {
+        for (Card card : playedPile) {
+            counts[card.getRank().getValueCode() - 2]++;
+        }
+    }
 }

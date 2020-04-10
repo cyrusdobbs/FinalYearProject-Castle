@@ -22,11 +22,11 @@ public class SimpleGameState {
     private boolean deckEmpty;
 
     public SimpleGameState(Hand hand, FaceUpCastleCards castleFU, int castleFDSize, int opHandSize, FaceUpCastleCards opCastleFU, int opCastleFDSize, Card topCard, boolean deckEmpty) {
-        this.hand = hand;
-        this.castleFU = castleFU;
+        this.hand = (Hand) orderCards(hand);
+        this.castleFU = (FaceUpCastleCards) orderCards(castleFU);
         this.castleFDSize = castleFDSize;
         this.opHandSize = opHandSize;
-        this.opCastleFU = opCastleFU;
+        this.opCastleFU = (FaceUpCastleCards) orderCards(opCastleFU);
         this.opCastleFDSize = opCastleFDSize;
         this.topCard = topCard;
         this.deckEmpty = deckEmpty;
@@ -46,6 +46,8 @@ public class SimpleGameState {
         return newEntry;
     }
 
+    // TODO: Cards to NParray here
+
     private static String[] cardsToStringArray(CardCollection cards) {
         if (cards.isEmpty()) {
             return new String[]{};
@@ -60,6 +62,11 @@ public class SimpleGameState {
         String[] array = stringBuilder.toString().split("\\|");
         Arrays.sort(array, Comparator.comparingInt(Integer::parseInt));
         return array;
+    }
+
+    private CardCollection orderCards(CardCollection cardCollection) {
+        cardCollection.getCardCollection().sort(Comparator.comparing(o -> o.getRank().getStrength()));
+        return cardCollection;
     }
 
     public Hand getHand() {

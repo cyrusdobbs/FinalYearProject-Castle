@@ -113,6 +113,12 @@ public abstract class CardCollection {
         return legalCards;
     }
 
+    public void updateCount(int[] counts) {
+        for (Card card : getCardCollection()) {
+            counts[card.getRank().getValueCode() - 2]++;
+        }
+    }
+
 //    protected Card chooseCard(String from) {
 //        System.out.println("Which model.cards.card would you like to swap?");
 //        return removeCard(getParsedIntegerInput("1|2|3"));

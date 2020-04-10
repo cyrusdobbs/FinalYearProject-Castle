@@ -2,8 +2,10 @@ package util;
 
 import controller.TerminalGameController;
 import controller.players.AIController;
-import controller.players.IsmctsPlayerController;
+import controller.players.ismcts.EvaluatingIsmctsPlayerController;
+import controller.players.ismcts.IsmctsPlayerController;
 import controller.players.LowestPlayerController;
+import controller.players.ismcts.StandardIsmctsPlayerController;
 import model.GameHistory;
 import model.GameState;
 import model.Player;
@@ -64,7 +66,11 @@ public class Run {
         }
 
         if (endConditionType.equals(TIME)) {
-            runUntilTime(endCondition);
+            if (endCondition != 0) {
+                runUntilTime(endCondition);
+            } else {
+                run();
+            }
         } else if (endConditionType.equals(GAMES)) {
             runUntilNoOfGames(endCondition);
         }
@@ -80,11 +86,9 @@ public class Run {
         logger.info("Application finished.");
     }
 
-    private static void runUntilNoOfGames(int endCondition) throws IOException {
-        long startTime = System.currentTimeMillis();
-
+    private static void run() throws IOException {
         List<GameHistory> gameHistories = new ArrayList<>();
-        for (int i = 0; i < endCondition; i++) {
+        while (true) {
 
             GameHistory gameHistory = runGame();
             gamesPlayed++;
@@ -95,12 +99,6 @@ public class Run {
                 gameHistories.clear();
             }
         }
-
-        if (!gameHistories.isEmpty()) {
-            export(gameHistories);
-        }
-
-        timeElapsed = System.currentTimeMillis() - startTime;
     }
 
     private static void runUntilTime(int endCondition) throws IOException {
@@ -127,6 +125,29 @@ public class Run {
         timeElapsed = endCondition * CastleConstants.MINUTE_TO_MS;
     }
 
+    private static void runUntilNoOfGames(int endCondition) throws IOException {
+        long startTime = System.currentTimeMillis();
+
+        List<GameHistory> gameHistories = new ArrayList<>();
+        for (int i = 0; i < endCondition; i++) {
+
+            GameHistory gameHistory = runGame();
+            gamesPlayed++;
+            gameHistories.add(gameHistory);
+
+            if (gamesPlayed % GAMES_PER_EXPORT == 0) {
+                export(gameHistories);
+                gameHistories.clear();
+            }
+        }
+
+        if (!gameHistories.isEmpty()) {
+            export(gameHistories);
+        }
+
+        timeElapsed = System.currentTimeMillis() - startTime;
+    }
+
     private static GameHistory runGame() {
         logger.info("New game.");
         TerminalGameController game = getNewGame();
@@ -148,8 +169,9 @@ public class Run {
 
         List<AIController> players = new ArrayList<>();
 
-        players.add(new IsmctsPlayerController(playerModels.get(0), MAX_ITERATIONS, false, print));
+        //players.add(new EvaluatingIsmctsPlayerController(playerModels.get(0), MAX_ITERATIONS, false, print, new Evaluator("convModel.h5"), 20));
         players.add(new LowestPlayerController(playerModels.get(1)));
+        players.add(new StandardIsmctsPlayerController(playerModels.get(0), MAX_ITERATIONS, false, print));
 
 //        if (random.nextBoolean()) {
 //            players.add(new IsmctsPlayerController(playerModels.get(0), 2500, false, true));

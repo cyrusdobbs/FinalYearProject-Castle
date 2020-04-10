@@ -71,7 +71,8 @@ public class GameState {
                      int castleSize,
                      int noOfPlayers,
                      boolean gameOver,
-                     CastleMove lastMove) {
+                     CastleMove lastMove,
+                     int winningPlayer) {
         this.deck = deck;
         this.discardPile = discardPile;
         this.players = players;
@@ -81,6 +82,7 @@ public class GameState {
         this.noOfPlayers = noOfPlayers;
         this.gameOver = gameOver;
         this.lastMove = lastMove;
+        this.winningPlayer = winningPlayer;
     }
 
     public int getResult(int playerJustMoved) {
@@ -158,7 +160,7 @@ public class GameState {
     }
 
     public GameState copy() {
-        return new GameState(new Deck(deck), new DiscardPile(discardPile), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastMove);
+        return new GameState(new Deck(deck), new DiscardPile(discardPile), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastMove, winningPlayer);
     }
 
     private List<Player> copyPlayers() {
@@ -186,5 +188,26 @@ public class GameState {
                 getLowestPlayer().getFaceDownCastleCards().size(),
                 discardPile.getTopCard(),
                 deck.isEmpty());
+    }
+
+    public boolean isStateValid() {
+        int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        deck.updateCount(counts);
+        discardPile.updateCounts(counts);
+
+        for (Player player : players) {
+            player.getHand().updateCount(counts);
+            player.getFaceDownCastleCards().updateCount(counts);
+            player.getFaceUpCastleCards().updateCount(counts);
+        }
+
+        for (int i = 0; i < 13; i++) {
+            if (counts[i] > 4) {
+                // System.out.println("ERORRORORORR!");
+                return false;
+            }
+        }
+        return true;
     }
 }

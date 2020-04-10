@@ -1,6 +1,7 @@
-package controller.players;
+package controller.players.ismcts;
 
-import controller.TerminalGameController;
+import controller.players.AIController;
+import controller.players.PlayerController;
 import moves.*;
 import model.cards.Deck;
 import model.cards.card.Card;
@@ -10,7 +11,7 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.util.*;
 
-public class IsmctsPlayerController extends PlayerController implements AIController {
+public abstract class IsmctsPlayerController extends PlayerController implements AIController {
 
     private int maxIterations;
     private double exploration;
@@ -43,27 +44,25 @@ public class IsmctsPlayerController extends PlayerController implements AIContro
             GameState currentGameState = cloneAndRandomize(gameState);
 
             // Select
-            while (!getMoves(currentGameState).isEmpty() && node.getUntriedMoves(getMoves(currentGameState)).isEmpty()) {
-                node = node.UCBSelectChild(getMoves(currentGameState), exploration);
+            List<CastleMove> availableMovesForSelection = getMoves(currentGameState);
+            while (!availableMovesForSelection.isEmpty() && node.getUntriedMoves(availableMovesForSelection).isEmpty()) {
+                node = node.UCBSelectChild(availableMovesForSelection, exploration);
                 doMove(node.getMove(), currentGameState);
             }
 
             // Expand
-            if (!node.getUntriedMoves(getMoves(currentGameState)).isEmpty()) {
-                CastleMove move = getRandomMove(node.getUntriedMoves(getMoves(currentGameState)));
+            List<CastleMove> availableMovesForExpansion = getMoves(currentGameState);
+            if (!node.getUntriedMoves(availableMovesForExpansion).isEmpty()) {
+                CastleMove move = getRandomMove(node.getUntriedMoves(availableMovesForExpansion));
                 int player = currentGameState.getCurrentPlayer();
                 doMove(move, currentGameState);
                 node.addChild(move, player);
             }
 
-            // Simulate
-            while (!getMoves(currentGameState).isEmpty()) {
-                doMove(getRandomMove(getMoves(currentGameState)), currentGameState);
-            }
+            simulate(currentGameState);
 
-            // Backpropagate
             while (node != null) {
-                node.update(currentGameState);
+                node.update(getWinningPlayer(currentGameState));
                 node = node.getParentNode();
             }
         }
@@ -80,8 +79,12 @@ public class IsmctsPlayerController extends PlayerController implements AIContro
         return bestMoveFound != null ? bestMoveFound : rootNode.getChildNodes().get(random.nextInt(rootNode.getChildNodes().size())).getMove();
     }
 
+    protected abstract void simulate(GameState currentGameState);
+
+    protected abstract int getWinningPlayer(GameState currentGameState);
+
     // IF THIS CHANGES CHANGE IN TERMINAL CONTROLLER
-    private void doMove(CastleMove move, GameState gameState) {
+    protected void doMove(CastleMove move, GameState gameState) {
         move.doMove(gameState);
         endTurn(move, gameState);
         gameState.setLastMove(move);
@@ -144,7 +147,7 @@ public class IsmctsPlayerController extends PlayerController implements AIContro
         return observedCards;
     }
 
-    private List<CastleMove> getMoves(GameState gameState) {
+    protected List<CastleMove> getMoves(GameState gameState) {
         Player playerHasGo = gameState.getPlayers().get(gameState.getCurrentPlayer());
         if (!playerHasGo.hasPickedCastle()) {
             return getPickCastleMoves(playerHasGo, gameState);
@@ -202,7 +205,7 @@ public class IsmctsPlayerController extends PlayerController implements AIContro
         return playFDCastleCardMoves;
     }
 
-    private CastleMove getRandomMove(List<CastleMove> moves) {
+    protected CastleMove getRandomMove(List<CastleMove> moves) {
         return moves.get(random.nextInt(moves.size()));
     }
 }
