@@ -4,6 +4,8 @@ import model.cards.CardCollection;
 import model.cards.FaceUpCastleCards;
 import model.cards.Hand;
 import model.cards.card.Card;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import util.sqlexporter.Entry;
 import util.CastleConstants;
 
@@ -47,6 +49,21 @@ public class SimpleGameState {
     }
 
     // TODO: Cards to NParray here
+    public INDArray toNDArray() {
+        INDArray array = Nd4j.concat(0, hand.toNDArray(), castleFU.toNDArray());
+        array = Nd4j.concat(0, array, opCastleFU.toNDArray());
+        INDArray zeros = Nd4j.zeros(4,2);
+        array = Nd4j.concat(0, array, zeros);
+
+        for (int i = 0; i < opHandSize; i++) {
+            array.putScalar(0, 39, 1);
+        }
+        for (int i = 0; i < opCastleFDSize; i++) {
+            array.putScalar(0, 40, 1);
+        }
+
+        return array;
+    }
 
     private static String[] cardsToStringArray(CardCollection cards) {
         if (cards.isEmpty()) {

@@ -38,6 +38,7 @@ public abstract class PlayCard extends CastleMove {
     }
 
     private void burn(GameState gameState) {
+        gameState.getBurnedCards().addAll(gameState.getDiscardPile().getPlayedPile());
         gameState.getDiscardPile().burn();
         burnsPile = true;
     }

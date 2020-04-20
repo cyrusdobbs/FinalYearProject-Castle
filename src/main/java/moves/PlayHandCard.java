@@ -9,10 +9,6 @@ public class PlayHandCard extends PlayCard {
 
     private String topDeckString = "";
 
-    public PlayHandCard(int player, Card cardPlayed) {
-        super(player, cardPlayed);
-    }
-
     public PlayHandCard(int player, List<Card> cardsPlayed) {
         super(player, cardsPlayed);
     }

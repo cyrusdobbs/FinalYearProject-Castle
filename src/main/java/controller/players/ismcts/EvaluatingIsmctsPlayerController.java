@@ -9,8 +9,8 @@ public class EvaluatingIsmctsPlayerController extends IsmctsPlayerController {
     Evaluator evaluator;
     int maxDepth;
 
-    public EvaluatingIsmctsPlayerController(Player playerModel, int maxIterations, boolean verbose, boolean print, Evaluator evaluator, int maxDepth) {
-        super(playerModel, maxIterations, verbose, print);
+    public EvaluatingIsmctsPlayerController(Player playerModel, int playerNo, int maxIterations, boolean verbose, boolean print, Evaluator evaluator, int maxDepth) {
+        super(playerModel, playerNo, maxIterations, verbose, print);
         this.evaluator = evaluator;
         this.maxDepth = maxDepth;
     }
@@ -18,7 +18,8 @@ public class EvaluatingIsmctsPlayerController extends IsmctsPlayerController {
     @Override
     protected void simulate(GameState currentGameState) {
         int depth = 0;
-        while (depth < maxDepth & !getMoves(currentGameState).isEmpty()) {
+        // While below maxDepth or
+        while ((depth < maxDepth || currentGameState.getCurrentPlayer() != playerNo) & !getMoves(currentGameState).isEmpty()) {
             doMove(getRandomMove(getMoves(currentGameState)), currentGameState);
             depth++;
         }
@@ -29,10 +30,8 @@ public class EvaluatingIsmctsPlayerController extends IsmctsPlayerController {
         // If the game is unfinished, predict the winner.
         int winningPlayer = currentGameState.getWinningPlayer();
         if (winningPlayer == -1) {
-            currentGameState.isStateValid();
-            int evaluation = evaluator.evaluate(currentGameState.toSimpleGameState());
-            boolean mctsToWin = evaluation == 1;
-            winningPlayer = mctsToWin ? 1 : 0;
+            boolean thisPlayerToWin = evaluator.evaluate(currentGameState.toSimpleGameState(playerNo)) == 1;
+            winningPlayer = thisPlayerToWin ? playerNo : 1 - playerNo;
         }
         return winningPlayer;
     }

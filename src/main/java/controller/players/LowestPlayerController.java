@@ -11,8 +11,8 @@ import java.util.List;
 
 public class LowestPlayerController extends PlayerController implements AIController {
 
-    public LowestPlayerController(Player playerModel) {
-        super(playerModel);
+    public LowestPlayerController(Player playerModel, int playerNo) {
+        super(playerModel, playerNo);
     }
 
     @Override

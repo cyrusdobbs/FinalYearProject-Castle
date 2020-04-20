@@ -62,16 +62,16 @@ class CSVExporter {
         }
     }
 
-    void writeSummary(long timeElapsed, int gamesPlayed, int aiWins, int lowestWins, int iterations) throws IOException {
+    void writeSummary(long timeElapsed, int gamesPlayed, int trackedWins, int otherWins, int iterations) throws IOException {
         newFile(true);
-        csvWriter.writeNext(new String[]{"AVERAGE_GAME_TIME_SECS", "TIME_ELAPSED_SECS", "TIME_ELAPSED_MINUTES", "TIME_ELAPSED_HOURS", "TOTAL_GAMES", "AI_WINS", "LOWEST_WINS", "AI_ITERATIONS"});
+        csvWriter.writeNext(new String[]{"AVERAGE_GAME_TIME_SECS", "TIME_ELAPSED_SECS", "TIME_ELAPSED_MINUTES", "TIME_ELAPSED_HOURS", "TOTAL_GAMES", "TRACKED_WINS", "OTHER_WINS", "MCTS_ITERATIONS"});
         csvWriter.writeNext(new String[]{gamesPlayed > 0 ? String.valueOf(timeElapsed / CastleConstants.SECOND_TO_MS / gamesPlayed) : "0",
                 String.valueOf(timeElapsed / CastleConstants.SECOND_TO_MS),
                 String.valueOf(timeElapsed / CastleConstants.MINUTE_TO_MS),
                 String.valueOf(timeElapsed / CastleConstants.HOUR_TO_MS),
                 String.valueOf(gamesPlayed),
-                String.valueOf(aiWins),
-                String.valueOf(lowestWins),
+                String.valueOf(trackedWins),
+                String.valueOf(otherWins),
                 String.valueOf(iterations)});
     }
 

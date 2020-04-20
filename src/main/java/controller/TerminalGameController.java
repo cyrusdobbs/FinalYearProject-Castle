@@ -6,6 +6,7 @@ import model.GameHistory;
 import model.SimpleGameState;
 import moves.*;
 import model.GameState;
+import util.Run;
 import view.TextGameView;
 
 import java.io.IOException;
@@ -18,11 +19,13 @@ public class TerminalGameController {
     private TextGameView gameView;
 
     private List<AIController> players;
+    private int trackedPlayer;
 
-    public TerminalGameController(GameState gameState, TextGameView gameView, List<AIController> players) {
+    public TerminalGameController(GameState gameState, TextGameView gameView, List<AIController> players, int trackedPlayer) {
         this.gameState = gameState;
         this.gameView = gameView;
         this.players = players;
+        this.trackedPlayer = trackedPlayer;
     }
 
     public GameHistory run(boolean print) {
@@ -33,8 +36,8 @@ public class TerminalGameController {
                 while (true) {
 
                     // Snapshot GameState at the beginning of every AI turn
-                    if (gameState.getCurrentPlayerType().equals(CastleConstants.ISMCTS)) {
-                        gameStates.add(gameState.toSimpleGameState());
+                    if (gameState.getCurrentPlayer() == trackedPlayer) {
+                        gameStates.add(gameState.toSimpleGameState(trackedPlayer));
                     }
 
                     CastleMove move = player.getMove(gameState);
@@ -45,7 +48,7 @@ public class TerminalGameController {
                     }
 
                     if (gameState.isGameOver()) {
-                        return new GameHistory(gameStates, gameState.getCurrentPlayerType().equals(CastleConstants.ISMCTS));
+                        return new GameHistory(gameStates, gameState.getWinningPlayer() == trackedPlayer);
                     }
 
                     // If the player does not burn the pile then it is the next players turn

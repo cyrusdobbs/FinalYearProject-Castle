@@ -2,9 +2,8 @@ package util;
 
 import controller.TerminalGameController;
 import controller.players.AIController;
-import controller.players.ismcts.EvaluatingIsmctsPlayerController;
-import controller.players.ismcts.IsmctsPlayerController;
 import controller.players.LowestPlayerController;
+import controller.players.ismcts.EvaluatingIsmctsPlayerController;
 import controller.players.ismcts.StandardIsmctsPlayerController;
 import model.GameHistory;
 import model.GameState;
@@ -45,8 +44,8 @@ public class Run {
     private static long timeElapsed;
 
     private static int gamesPlayed;
-    private static int aiWins;
-    private static int lowestWins;
+    private static int trackedWins;
+    private static int otherWins;
 
     private static int failedUpload_gamesPlayed;
     private static int failedUpload_aiWins;
@@ -61,6 +60,7 @@ public class Run {
         print = args[2].equals(YES);
         uploadToDatabase = args[3].equals(YES);
         CSVExporter = new CSVExporter(FILE_NAME_PREFIX);
+
         if (uploadToDatabase) {
             SQLExporter = new SQLExporter();
         }
@@ -79,7 +79,7 @@ public class Run {
             CSVExporter.writeSummary(timeElapsed, failedUpload_gamesPlayed, failedUpload_aiWins, failedUpload_lowestWins, MAX_ITERATIONS);
             logger.info("Failed SQL upload summary written.");
         } else {
-            CSVExporter.writeSummary(timeElapsed, gamesPlayed, aiWins, lowestWins, MAX_ITERATIONS);
+            CSVExporter.writeSummary(timeElapsed, gamesPlayed, trackedWins, otherWins, MAX_ITERATIONS);
             logger.info("Summary written.");
         }
         CSVExporter.close();
@@ -154,34 +154,47 @@ public class Run {
         GameHistory gameHistory = game.run(print);
 
         if (gameHistory.hasWon()) {
-            aiWins++;
+            trackedWins++;
         } else {
-            lowestWins++;
+            otherWins++;
         }
         logger.info("Game finished.");
         return gameHistory;
     }
 
     private static TerminalGameController getNewGame() {
+//        List<Player> playerModels = new ArrayList<>();
+
+//        List<AIController> players = new ArrayList<>();
+//        playerModels.add(new Player(ISMCTS));
+//        playerModels.add(new Player(LOWEST));
+
+//        int trackedPlayer = 0;
+//        players.add(new EvaluatingIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print, new Evaluator("convModel.h5"), 40));
+//        players.add(new LowestPlayerController(playerModels.get(1), 1));
+        //players.add(new StandardIsmctsPlayerController(playerModels.get(1), 0, MAX_ITERATIONS, false, print));
+
         List<Player> playerModels = new ArrayList<>();
-        playerModels.add(new Player(ISMCTS));
-        playerModels.add(new Player(LOWEST));
-
         List<AIController> players = new ArrayList<>();
+        int trackedPlayer;
+        if (random.nextBoolean()) {
+            logger.info("Player1: ISMCTS | Player2: Lowest.");
+            trackedPlayer = 0;
+            playerModels.add(new Player(ISMCTS));
+            playerModels.add(new Player(LOWEST));
+            players.add(new StandardIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print));
+            players.add(new LowestPlayerController(playerModels.get(1), 1));
 
-        //players.add(new EvaluatingIsmctsPlayerController(playerModels.get(0), MAX_ITERATIONS, false, print, new Evaluator("convModel.h5"), 20));
-        players.add(new LowestPlayerController(playerModels.get(1)));
-        players.add(new StandardIsmctsPlayerController(playerModels.get(0), MAX_ITERATIONS, false, print));
+        } else {
+            logger.info("Player1: Lowest | Player2: ISMCTS.");
+            trackedPlayer = 1;
+            playerModels.add(new Player(LOWEST));
+            playerModels.add(new Player(ISMCTS));
+            players.add(new LowestPlayerController(playerModels.get(0), 0));
+            players.add(new StandardIsmctsPlayerController(playerModels.get(1), 1, MAX_ITERATIONS, false, print));
+        }
 
-//        if (random.nextBoolean()) {
-//            players.add(new IsmctsPlayerController(playerModels.get(0), 2500, false, true));
-//            players.add(new LowestPlayerController(playerModels.get(1)));
-//        } else {
-//            players.add(new LowestPlayerController(playerModels.get(1)));
-//            players.add(new IsmctsPlayerController(playerModels.get(0), 2500, false, true));
-//        }
-
-        return new TerminalGameController(new GameState(playerModels), new TextGameView(), players);
+        return new TerminalGameController(new GameState(playerModels), new TextGameView(), players, trackedPlayer);
     }
 
     private static void export(List<GameHistory> gameHistories) throws IOException {
@@ -192,15 +205,15 @@ public class Run {
                 System.out.println(getCurrentTime() + ": Successfully uploaded " + gameHistories.size() + " games to the database.");
                 logger.info("Games exported to DB.");
             } catch (SQLException e) {
-                int noOfAiWins = countAiWins(gameHistories);
+                int wins = countTrackedWins(gameHistories);
                 String time = getCurrentTime();
                 System.out.println(time + ": SQLException: " + e.getMessage());
                 System.out.println(time + ": Exported as CSV instead.");
                 // Export to CSV if DB fails
                 CSVExporter.exportGames(gameHistories);
                 failedUpload_gamesPlayed += gameHistories.size();
-                failedUpload_aiWins += noOfAiWins;
-                failedUpload_lowestWins += gameHistories.size() - noOfAiWins;
+                failedUpload_aiWins += wins;
+                failedUpload_lowestWins += gameHistories.size() - wins;
                 logger.info("DB export failed, exported to CSV.");
             }
         } else {
@@ -209,14 +222,14 @@ public class Run {
         }
     }
 
-    private static int countAiWins(List<GameHistory> gameHistories) {
-        int aiWins = 0;
+    private static int countTrackedWins(List<GameHistory> gameHistories) {
+        int wins = 0;
         for (GameHistory gameHistory : gameHistories) {
             if (gameHistory.hasWon()) {
-                aiWins++;
+                wins++;
             }
         }
-        return aiWins;
+        return wins;
     }
 
     private static String getCurrentTime() {

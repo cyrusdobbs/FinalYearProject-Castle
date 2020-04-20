@@ -1,6 +1,5 @@
 package util;
 
-import model.GameState;
 import model.SimpleGameState;
 import model.cards.CardCollection;
 import model.cards.card.Card;
@@ -47,8 +46,7 @@ public class Evaluator {
 //            {"2"}
 //        };
 
-        INDArray input = getNDArray(gameStateArray, gameState);
-
+        INDArray input = gameState.toNDArray();
 
         input = Nd4j.expandDims(input, 0);
         input = Nd4j.expandDims(input, 0);

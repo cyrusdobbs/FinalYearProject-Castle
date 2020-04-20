@@ -2,6 +2,9 @@ package model.cards;
 
 
 import model.cards.card.Card;
+import org.nd4j.linalg.api.buffer.DataType;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -117,6 +120,31 @@ public abstract class CardCollection {
         for (Card card : getCardCollection()) {
             counts[card.getRank().getValueCode() - 2]++;
         }
+    }
+
+    public INDArray toNDArray() {
+        INDArray array = Nd4j.zeros(new int[]{4, 13}, DataType.UINT32);
+        sortCardsByStrength();
+
+        int copies = 0;
+        Card previousCard = null;
+        for (Card card : getCardCollection()) {
+
+            if (previousCard != null) {
+                if (card.getRank().getValueCode() == previousCard.getRank().getValueCode()) {
+                    copies++;
+                } else {
+                    copies = 0;
+                }
+            }
+
+            int row = copies;
+            int col = card.getRank().getValueCode() - 2;
+            array.putScalar(row, col, 1);
+            previousCard = card;
+        }
+
+        return array;
     }
 
 //    protected Card chooseCard(String from) {

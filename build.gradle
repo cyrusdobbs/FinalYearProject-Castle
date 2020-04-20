@@ -41,11 +41,18 @@ dependencies {
     // https://mvnrepository.com/artifact/log4j/log4j
     compile group: 'log4j', name: 'log4j', version: '1.2.16'
     // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
-    compile group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '1.0.0-beta6'
+//    compile group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '1.0.0-beta6'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-modelimport
+    compile group: 'org.deeplearning4j', name: 'deeplearning4j-modelimport', version: '1.0.0-beta6'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-nn
+    compile group: 'org.deeplearning4j', name: 'deeplearning4j-nn', version: '1.0.0-beta6'
+    // https://mvnrepository.com/artifact/org.nd4j/nd4j-native
+    compile group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6'
+
     // https://mvnrepository.com/artifact/org.nd4j/nd4j-native-platform
-    compile group: 'org.nd4j', name: 'nd4j-native-platform', version: '1.0.0-beta6'
-
-
+//    compile group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6'
+//    // https://mvnrepository.com/artifact/org.nd4j/nd4j-cuda-10.2
+//    compile group: 'org.nd4j', name: 'nd4j-cuda-10.2', version: '1.0.0-beta6'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     extraLibs group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
@@ -57,11 +64,17 @@ dependencies {
     // https://mvnrepository.com/artifact/log4j/log4j
     extraLibs group: 'log4j', name: 'log4j', version: '1.2.16'
     // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
-    extraLibs group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '1.0.0-beta6'
+//    extraLibs group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '1.0.0-beta6'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-modelimport
+    extraLibs group: 'org.deeplearning4j', name: 'deeplearning4j-modelimport', version: '1.0.0-beta6'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-nn
+    extraLibs group: 'org.deeplearning4j', name: 'deeplearning4j-nn', version: '1.0.0-beta6'
+    // https://mvnrepository.com/artifact/org.nd4j/nd4j-native
+    extraLibs group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6'
     // https://mvnrepository.com/artifact/org.nd4j/nd4j-native-platform
-    extraLibs group: 'org.nd4j', name: 'nd4j-native-platform', version: '1.0.0-beta6'
-
-
+//    extraLibs group: 'org.nd4j', name: 'nd4j-native-platform', version: '1.0.0-beta6'
+//    // https://mvnrepository.com/artifact/org.nd4j/nd4j-cuda-10.2
+//    extraLibs group: 'org.nd4j', name: 'nd4j-cuda-10.2', version: '1.0.0-beta6'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

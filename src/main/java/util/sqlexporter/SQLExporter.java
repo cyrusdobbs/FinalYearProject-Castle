@@ -15,9 +15,11 @@ public class SQLExporter {
 
     private static final String SUMMARY_TEST = "Summary_Test";
     private static final String SUMMARY = "Summary";
+    private static final String SUMMARY_NEW = "Summary_New";
 
     private static final String INSERT_STATEMENT_TEST = "INSERT INTO `Entries_Test` (`HAND`, `CASTLE_FU`, `CASTLE_FD_SIZE`, `OP_HAND_SIZE`, `OP_CASTLE_FU`, `OP_CASTLE_FD_SIZE`, `TOP`, `DECK_EMPTY`, `WON`) VALUES ";
     private static final String INSERT_STATEMENT = "INSERT INTO `Entries` (`HAND`, `CASTLE_FU`, `CASTLE_FD_SIZE`, `OP_HAND_SIZE`, `OP_CASTLE_FU`, `OP_CASTLE_FD_SIZE`, `TOP`, `DECK_EMPTY`, `WON`) VALUES ";
+    private static final String INSERT_STATEMENT_NEW = "INSERT INTO `Entries_New` (`HAND`, `CASTLE_FU`, `CASTLE_FD_SIZE`, `OP_HAND_SIZE`, `OP_CASTLE_FU`, `OP_CASTLE_FD_SIZE`, `TOP`, `DECK_EMPTY`, `WON`) VALUES ";
 
     private Connection connection;
 
@@ -55,7 +57,7 @@ public class SQLExporter {
 
         stmt = connection.createStatement();
 
-        if (stmt.execute("SELECT * FROM " + SUMMARY)) {
+        if (stmt.execute("SELECT * FROM " + SUMMARY_NEW)) {
             rs = stmt.getResultSet();
         }
 
@@ -87,13 +89,13 @@ public class SQLExporter {
     private void loadEntries(List<Entry> entries, int[] summaryValues) throws SQLException {
         Statement stmt;
 
-        StringBuilder insertStatement = new StringBuilder(INSERT_STATEMENT);
+        StringBuilder insertStatement = new StringBuilder(INSERT_STATEMENT_NEW);
         for (Entry entry : entries) {
             insertStatement.append(entry.getSqlStatement()).append(",");
         }
         insertStatement.deleteCharAt(insertStatement.length() - 1);
 
-        String updateStatement = "UPDATE " + SUMMARY + " SET " +
+        String updateStatement = "UPDATE " + SUMMARY_NEW + " SET " +
                 "TOTAL_GAMES =" + summaryValues[0]
                 + ", AI_WINS =" + summaryValues[1]
                 + ", LOWEST_WINS =" + summaryValues[2] + ";";

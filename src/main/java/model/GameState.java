@@ -1,9 +1,9 @@
 package model;
 
+import model.cards.card.Card;
 import moves.*;
 import model.cards.Deck;
 import model.cards.DiscardPile;
-import util.CastleConstants;
 
 import java.util.*;
 
@@ -11,6 +11,7 @@ public class GameState {
 
     private Deck deck;
     private DiscardPile discardPile;
+    private List<Card> burnedCards;
     private List<Player> players;
     private int currentPlayer;
     private int handSize;
@@ -24,6 +25,7 @@ public class GameState {
         deck = new Deck();
         deck.shuffle();
         discardPile = new DiscardPile();
+        burnedCards = new ArrayList<>();
         deck.shuffle();
 
         players = new ArrayList<>();
@@ -51,50 +53,16 @@ public class GameState {
         }
     }
 
-    public GameState(Deck deck, DiscardPile discardPile, List<Player> players, int handSize, int castleSize) {
-        this.deck = deck;
-        this.discardPile = discardPile;
-        this.players = players;
-        this.handSize = handSize;
-        this.castleSize = castleSize;
-        noOfPlayers = players.size();
-        gameOver = false;
-        currentPlayer = 0;
-        lastMove = null;
-    }
-
-    public GameState(Deck deck,
-                     DiscardPile discardPile,
-                     List<Player> players,
-                     int currentPlayer,
-                     int handSize,
-                     int castleSize,
-                     int noOfPlayers,
-                     boolean gameOver,
-                     CastleMove lastMove,
-                     int winningPlayer) {
-        this.deck = deck;
-        this.discardPile = discardPile;
-        this.players = players;
-        this.currentPlayer = currentPlayer;
-        this.handSize = handSize;
-        this.castleSize = castleSize;
-        this.noOfPlayers = noOfPlayers;
-        this.gameOver = gameOver;
-        this.lastMove = lastMove;
-        this.winningPlayer = winningPlayer;
-    }
-
-    public int getResult(int playerJustMoved) {
-        return (gameOver && playerJustMoved == winningPlayer) ? 1 : 0;
-    }
-
     public Deck getDeck() {
         return deck;
     }
 
     public DiscardPile getDiscardPile() {
         return discardPile;
+    }
+
+    public List<Card> getBurnedCards() {
+        return burnedCards;
     }
 
     public List<Player> getPlayers() {
@@ -125,28 +93,6 @@ public class GameState {
         return currentPlayer;
     }
 
-    public String getCurrentPlayerType() {
-        return players.get(currentPlayer).getName();
-    }
-
-    public Player getAIPlayer() {
-        for (Player player : players) {
-            if (player.getName().equals(CastleConstants.ISMCTS)) {
-                return player;
-            }
-        }
-        return null;
-    }
-
-    public Player getLowestPlayer() {
-        for (Player player : players) {
-            if (player.getName().equals(CastleConstants.LOWEST)) {
-                return player;
-            }
-        }
-        return null;
-    }
-
     public void setCurrentPlayer(int currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
@@ -159,8 +105,56 @@ public class GameState {
         this.lastMove = lastMove;
     }
 
+    public int getWinningPlayer() {
+        return winningPlayer;
+    }
+
+    public void setWinningPlayer(int winningPlayer) {
+        this.winningPlayer = winningPlayer;
+    }
+
+    public SimpleGameState toSimpleGameState(int povPlayer) {
+        int otherPlayer = 1 - povPlayer;
+        return new SimpleGameState(players.get(povPlayer).getHand().copy(),
+                players.get(povPlayer).getFaceUpCastleCards().copy(),
+                players.get(povPlayer).getFaceDownCastleCards().size(),
+                players.get(otherPlayer).getHand().size(),
+                players.get(otherPlayer).getFaceUpCastleCards().copy(),
+                players.get(otherPlayer).getFaceDownCastleCards().size(),
+                discardPile.getTopCard(),
+                deck.isEmpty());
+    }
+
+    public void isStateValid() {
+        int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        deck.updateCount(counts);
+        discardPile.updateCounts(counts);
+
+        if (!burnedCards.isEmpty()) {
+            for (Card card : burnedCards) {
+                counts[card.getRank().getValueCode() - 2]++;
+            }
+        }
+
+        for (Player player : players) {
+            player.getHand().updateCount(counts);
+            player.getFaceDownCastleCards().updateCount(counts);
+            player.getFaceUpCastleCards().updateCount(counts);
+        }
+
+        for (int i = 0; i < 13; i++) {
+            if (counts[i] != 4) {
+                System.out.println("ERROR: Invalid state.");
+                System.out.println(Arrays.toString(counts));
+                System.exit(0);
+                return;
+            }
+        }
+    }
+
     public GameState copy() {
-        return new GameState(new Deck(deck), new DiscardPile(discardPile), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastMove, winningPlayer);
+        return new GameState(new Deck(deck), new DiscardPile(discardPile), new ArrayList<>(burnedCards), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastMove, winningPlayer);
     }
 
     private List<Player> copyPlayers() {
@@ -171,43 +165,27 @@ public class GameState {
         return playersCopy;
     }
 
-    public int getWinningPlayer() {
-        return winningPlayer;
-    }
-
-    public void setWinningPlayer(int winningPlayer) {
+    public GameState(Deck deck,
+                     DiscardPile discardPile,
+                     List<Card> burnedCards,
+                     List<Player> players,
+                     int currentPlayer,
+                     int handSize,
+                     int castleSize,
+                     int noOfPlayers,
+                     boolean gameOver,
+                     CastleMove lastMove,
+                     int winningPlayer) {
+        this.deck = deck;
+        this.discardPile = discardPile;
+        this.burnedCards = burnedCards;
+        this.players = players;
+        this.currentPlayer = currentPlayer;
+        this.handSize = handSize;
+        this.castleSize = castleSize;
+        this.noOfPlayers = noOfPlayers;
+        this.gameOver = gameOver;
+        this.lastMove = lastMove;
         this.winningPlayer = winningPlayer;
-    }
-
-    public SimpleGameState toSimpleGameState() {
-        return new SimpleGameState(getAIPlayer().getHand().copy(),
-                getAIPlayer().getFaceUpCastleCards().copy(),
-                getAIPlayer().getFaceDownCastleCards().size(),
-                getLowestPlayer().getHand().size(),
-                getLowestPlayer().getFaceUpCastleCards().copy(),
-                getLowestPlayer().getFaceDownCastleCards().size(),
-                discardPile.getTopCard(),
-                deck.isEmpty());
-    }
-
-    public boolean isStateValid() {
-        int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-        deck.updateCount(counts);
-        discardPile.updateCounts(counts);
-
-        for (Player player : players) {
-            player.getHand().updateCount(counts);
-            player.getFaceDownCastleCards().updateCount(counts);
-            player.getFaceUpCastleCards().updateCount(counts);
-        }
-
-        for (int i = 0; i < 13; i++) {
-            if (counts[i] > 4) {
-                // System.out.println("ERORRORORORR!");
-                return false;
-            }
-        }
-        return true;
     }
 }

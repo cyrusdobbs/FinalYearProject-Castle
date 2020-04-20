@@ -19,8 +19,8 @@ public abstract class IsmctsPlayerController extends PlayerController implements
     private Random random;
     private boolean print;
 
-    public IsmctsPlayerController(Player playerModel, int maxIterations, boolean verbose, boolean print) {
-        super(playerModel);
+    public IsmctsPlayerController(Player playerModel, int playerNo, int maxIterations, boolean verbose, boolean print) {
+        super(playerModel, playerNo);
         this.maxIterations = maxIterations;
         exploration = 0.7;
         this.verbose = verbose;
@@ -99,6 +99,7 @@ public abstract class IsmctsPlayerController extends PlayerController implements
 
     private GameState cloneAndRandomize(GameState gameState) {
         GameState copiedState = gameState.copy();
+
         int observingPlayer = gameState.getCurrentPlayer();
 
         List<Card> observedCards = getObservedCards(copiedState);
@@ -106,14 +107,15 @@ public abstract class IsmctsPlayerController extends PlayerController implements
 
         Collections.shuffle(unseenCards);
         copiedState.getDeck().replaceWithUnseenCards(unseenCards);
-        for (int i = 0; i < copiedState.getPlayers().size(); i++) {
-            Player player = copiedState.getPlayers().get(i);
-            if (i != observingPlayer) {
+        for (int playerNo = 0; playerNo < copiedState.getPlayers().size(); playerNo++) {
+            Player player = copiedState.getPlayers().get(playerNo);
+            if (playerNo != observingPlayer) {
                 player.getHand().replaceWithUnseenCards(unseenCards);
             }
             player.getFaceDownCastleCards().replaceWithUnseenCards(unseenCards);
-
         }
+
+        copiedState.isStateValid();
         return copiedState;
     }
 
@@ -144,6 +146,7 @@ public abstract class IsmctsPlayerController extends PlayerController implements
         // Player can see what cards have been discarded (all for now)
         // TODO: Change number of discarded model.cards that can be remembered
         observedCards.addAll(gameState.getDiscardPile().getPlayedPile());
+        observedCards.addAll(gameState.getBurnedCards());
         return observedCards;
     }
 

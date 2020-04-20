@@ -5,8 +5,8 @@ import model.Player;
 
 public class StandardIsmctsPlayerController extends IsmctsPlayerController {
 
-    public StandardIsmctsPlayerController(Player playerModel, int maxIterations, boolean verbose, boolean print) {
-        super(playerModel, maxIterations, verbose, print);
+    public StandardIsmctsPlayerController(Player playerModel, int playerNo, int maxIterations, boolean verbose, boolean print) {
+        super(playerModel, playerNo, maxIterations, verbose, print);
     }
 
     @Override
