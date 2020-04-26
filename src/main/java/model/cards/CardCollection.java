@@ -2,7 +2,6 @@ package model.cards;
 
 
 import model.cards.card.Card;
-import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -123,7 +122,7 @@ public abstract class CardCollection {
     }
 
     public INDArray toNDArray() {
-        INDArray array = Nd4j.zeros(new int[]{4, 13}, DataType.UINT32);
+        INDArray array = Nd4j.zeros(new int[]{4, 13});
         sortCardsByStrength();
 
         int copies = 0;

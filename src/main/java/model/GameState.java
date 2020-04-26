@@ -4,6 +4,8 @@ import model.cards.card.Card;
 import moves.*;
 import model.cards.Deck;
 import model.cards.DiscardPile;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.*;
 
@@ -123,6 +125,25 @@ public class GameState {
                 players.get(otherPlayer).getFaceDownCastleCards().size(),
                 discardPile.getTopCard(),
                 deck.isEmpty());
+    }
+
+    public INDArray toNDArray(int povPlayer) {
+        int otherPlayer = 1 - povPlayer;
+
+        INDArray array = Nd4j.hstack(players.get(povPlayer).getHand().toNDArray(), players.get(povPlayer).getFaceUpCastleCards().toNDArray());
+        array = Nd4j.hstack(array, players.get(otherPlayer).getFaceUpCastleCards().toNDArray());
+
+        INDArray zeros = Nd4j.zeros(new int[]{4, 2});
+        array = Nd4j.hstack(array, zeros);
+
+        for (int i = 0; i < players.get(otherPlayer).getHand().size(); i++) {
+            array.putScalar(0, 39, 1);
+        }
+        for (int i = 0; i < players.get(otherPlayer).getFaceDownCastleCards().size(); i++) {
+            array.putScalar(0, 40, 1);
+        }
+
+        return array;
     }
 
     public void isStateValid() {

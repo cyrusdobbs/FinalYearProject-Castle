@@ -1,5 +1,6 @@
 package controller;
 
+import model.cards.DiscardPile;
 import util.CastleConstants;
 import controller.players.AIController;
 import model.GameHistory;

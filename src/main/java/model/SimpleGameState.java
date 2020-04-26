@@ -50,10 +50,11 @@ public class SimpleGameState {
 
     // TODO: Cards to NParray here
     public INDArray toNDArray() {
-        INDArray array = Nd4j.concat(0, hand.toNDArray(), castleFU.toNDArray());
-        array = Nd4j.concat(0, array, opCastleFU.toNDArray());
-        INDArray zeros = Nd4j.zeros(4,2);
-        array = Nd4j.concat(0, array, zeros);
+        INDArray array = Nd4j.hstack(hand.toNDArray(), castleFU.toNDArray());
+        array = Nd4j.hstack(array, opCastleFU.toNDArray());
+
+        INDArray zeros = Nd4j.zeros(new int[]{4, 2});
+        array = Nd4j.hstack(array, zeros);
 
         for (int i = 0; i < opHandSize; i++) {
             array.putScalar(0, 39, 1);

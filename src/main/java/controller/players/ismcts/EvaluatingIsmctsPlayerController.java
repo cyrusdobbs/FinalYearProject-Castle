@@ -2,7 +2,10 @@ package controller.players.ismcts;
 
 import model.GameState;
 import model.Player;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import util.CastleConstants;
 import util.Evaluator;
+import util.Run;
 
 public class EvaluatingIsmctsPlayerController extends IsmctsPlayerController {
 
@@ -30,9 +33,18 @@ public class EvaluatingIsmctsPlayerController extends IsmctsPlayerController {
         // If the game is unfinished, predict the winner.
         int winningPlayer = currentGameState.getWinningPlayer();
         if (winningPlayer == -1) {
-            boolean thisPlayerToWin = evaluator.evaluate(currentGameState.toSimpleGameState(playerNo)) == 1;
+            boolean thisPlayerToWin = evaluator.evaluate(currentGameState.toNDArray(playerNo)) == 1;
             winningPlayer = thisPlayerToWin ? playerNo : 1 - playerNo;
         }
+
+        INDArray array = currentGameState.toNDArray(playerNo);
+
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 50000; i++) {
+            evaluator.evaluate(array);
+        }
+        System.out.println((System.currentTimeMillis() - startTime) / 1000);
+        System.exit(0);
         return winningPlayer;
     }
 }

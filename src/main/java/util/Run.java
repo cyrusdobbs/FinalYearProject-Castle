@@ -10,6 +10,8 @@ import model.GameState;
 import model.Player;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException;
+import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfigurationException;
 import util.sqlexporter.SQLExporter;
 import view.TextGameView;
 
@@ -53,7 +55,9 @@ public class Run {
 
     private static Logger logger = LogManager.getLogger(Run.class);
 
-    public static void main(String[] args) throws IOException {
+    public static long evalTime = 0;
+
+    public static void main(String[] args) throws IOException, UnsupportedKerasConfigurationException, InvalidKerasConfigurationException {
         logger.info("Application started.");
         String endConditionType = args[0];
         int endCondition = Integer.parseInt(args[1]);
@@ -84,9 +88,10 @@ public class Run {
         }
         CSVExporter.close();
         logger.info("Application finished.");
+        System.out.println("Time for evaluation: " + (evalTime / 1000));
     }
 
-    private static void run() throws IOException {
+    private static void run() throws IOException, UnsupportedKerasConfigurationException, InvalidKerasConfigurationException {
         List<GameHistory> gameHistories = new ArrayList<>();
         while (true) {
 
@@ -101,7 +106,7 @@ public class Run {
         }
     }
 
-    private static void runUntilTime(int endCondition) throws IOException {
+    private static void runUntilTime(int endCondition) throws IOException, UnsupportedKerasConfigurationException, InvalidKerasConfigurationException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + (endCondition * CastleConstants.MINUTE_TO_MS);
 
@@ -125,7 +130,7 @@ public class Run {
         timeElapsed = endCondition * CastleConstants.MINUTE_TO_MS;
     }
 
-    private static void runUntilNoOfGames(int endCondition) throws IOException {
+    private static void runUntilNoOfGames(int endCondition) throws IOException, UnsupportedKerasConfigurationException, InvalidKerasConfigurationException {
         long startTime = System.currentTimeMillis();
 
         List<GameHistory> gameHistories = new ArrayList<>();
@@ -148,7 +153,7 @@ public class Run {
         timeElapsed = System.currentTimeMillis() - startTime;
     }
 
-    private static GameHistory runGame() {
+    private static GameHistory runGame() throws UnsupportedKerasConfigurationException, IOException, InvalidKerasConfigurationException {
         logger.info("New game.");
         TerminalGameController game = getNewGame();
         GameHistory gameHistory = game.run(print);
@@ -162,37 +167,37 @@ public class Run {
         return gameHistory;
     }
 
-    private static TerminalGameController getNewGame() {
-//        List<Player> playerModels = new ArrayList<>();
-
-//        List<AIController> players = new ArrayList<>();
-//        playerModels.add(new Player(ISMCTS));
-//        playerModels.add(new Player(LOWEST));
-
-//        int trackedPlayer = 0;
-//        players.add(new EvaluatingIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print, new Evaluator("convModel.h5"), 40));
-//        players.add(new LowestPlayerController(playerModels.get(1), 1));
-        //players.add(new StandardIsmctsPlayerController(playerModels.get(1), 0, MAX_ITERATIONS, false, print));
-
+    private static TerminalGameController getNewGame() throws InvalidKerasConfigurationException, IOException, UnsupportedKerasConfigurationException {
         List<Player> playerModels = new ArrayList<>();
-        List<AIController> players = new ArrayList<>();
-        int trackedPlayer;
-        if (random.nextBoolean()) {
-            logger.info("Player1: ISMCTS | Player2: Lowest.");
-            trackedPlayer = 0;
-            playerModels.add(new Player(ISMCTS));
-            playerModels.add(new Player(LOWEST));
-            players.add(new StandardIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print));
-            players.add(new LowestPlayerController(playerModels.get(1), 1));
 
-        } else {
-            logger.info("Player1: Lowest | Player2: ISMCTS.");
-            trackedPlayer = 1;
-            playerModels.add(new Player(LOWEST));
-            playerModels.add(new Player(ISMCTS));
-            players.add(new LowestPlayerController(playerModels.get(0), 0));
-            players.add(new StandardIsmctsPlayerController(playerModels.get(1), 1, MAX_ITERATIONS, false, print));
-        }
+        List<AIController> players = new ArrayList<>();
+        playerModels.add(new Player(ISMCTS));
+        playerModels.add(new Player(LOWEST));
+
+        int trackedPlayer = 0;
+        players.add(new EvaluatingIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print, new Evaluator("convModel.h5"), 40));
+        //players.add(new StandardIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print));
+        players.add(new LowestPlayerController(playerModels.get(1), 1));
+
+//        List<Player> playerModels = new ArrayList<>();
+//        List<AIController> players = new ArrayList<>();
+//        int trackedPlayer;
+//        if (random.nextBoolean()) {
+//            logger.info("Player1: ISMCTS | Player2: Lowest.");
+//            trackedPlayer = 0;
+//            playerModels.add(new Player(ISMCTS));
+//            playerModels.add(new Player(LOWEST));
+//            players.add(new StandardIsmctsPlayerController(playerModels.get(0), 0, MAX_ITERATIONS, false, print));
+//            players.add(new LowestPlayerController(playerModels.get(1), 1));
+//
+//        } else {
+//            logger.info("Player1: Lowest | Player2: ISMCTS.");
+//            trackedPlayer = 1;
+//            playerModels.add(new Player(LOWEST));
+//            playerModels.add(new Player(ISMCTS));
+//            players.add(new LowestPlayerController(playerModels.get(0), 0));
+//            players.add(new StandardIsmctsPlayerController(playerModels.get(1), 1, MAX_ITERATIONS, false, print));
+//        }
 
         return new TerminalGameController(new GameState(playerModels), new TextGameView(), players, trackedPlayer);
     }
