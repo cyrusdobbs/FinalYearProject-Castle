@@ -41,8 +41,4 @@ public enum Rank {
     public String getShortName() {
         return shortName;
     }
-
-    public static Set<Rank> getValues() {
-        return new HashSet<>(EnumSet.allOf(Rank.class));
-    }
 }

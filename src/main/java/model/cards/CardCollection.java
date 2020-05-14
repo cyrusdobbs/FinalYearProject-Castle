@@ -145,9 +145,4 @@ public abstract class CardCollection {
 
         return array;
     }
-
-//    protected Card chooseCard(String from) {
-//        System.out.println("Which model.cards.card would you like to swap?");
-//        return removeCard(getParsedIntegerInput("1|2|3"));
-//    }
 }

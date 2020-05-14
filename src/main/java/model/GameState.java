@@ -14,7 +14,7 @@ public class GameState {
     private Deck deck;
     private DiscardPile discardPile;
     private List<Card> burnedCards;
-    private List<Player> players;
+    private List<PlayerModel> playerModels;
     private int currentPlayer;
     private int handSize;
     private int castleSize;
@@ -23,15 +23,15 @@ public class GameState {
     private CastleMove lastMove;
     private int winningPlayer;
 
-    public GameState(List<Player> playerModels) {
+    public GameState(List<PlayerModel> playerModels) {
         deck = new Deck();
         deck.shuffle();
         discardPile = new DiscardPile();
         burnedCards = new ArrayList<>();
         deck.shuffle();
 
-        players = new ArrayList<>();
-        players.addAll(playerModels);
+        this.playerModels = new ArrayList<>();
+        this.playerModels.addAll(playerModels);
 
         currentPlayer = 0;
         handSize = 3;
@@ -43,13 +43,13 @@ public class GameState {
 
         // Deal castle
         for (int x = 0; x < castleSize; x++) {
-            for (Player player : players) {
+            for (PlayerModel player : this.playerModels) {
                 player.getFaceDownCastleCards().addCard(deck.topDeck());
             }
         }
         // Deal hands
         for (int x = 0; x < handSize + castleSize; x++) {
-            for (Player player : players) {
+            for (PlayerModel player : this.playerModels) {
                 player.getHand().addCard(deck.topDeck());
             }
         }
@@ -67,8 +67,8 @@ public class GameState {
         return burnedCards;
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public List<PlayerModel> getPlayerModels() {
+        return playerModels;
     }
 
     public int getHandSize() {
@@ -117,12 +117,12 @@ public class GameState {
 
     public SimpleGameState toSimpleGameState(int povPlayer) {
         int otherPlayer = 1 - povPlayer;
-        return new SimpleGameState(players.get(povPlayer).getHand().copy(),
-                players.get(povPlayer).getFaceUpCastleCards().copy(),
-                players.get(povPlayer).getFaceDownCastleCards().size(),
-                players.get(otherPlayer).getHand().size(),
-                players.get(otherPlayer).getFaceUpCastleCards().copy(),
-                players.get(otherPlayer).getFaceDownCastleCards().size(),
+        return new SimpleGameState(playerModels.get(povPlayer).getHand().copy(),
+                playerModels.get(povPlayer).getFaceUpCastleCards().copy(),
+                playerModels.get(povPlayer).getFaceDownCastleCards().size(),
+                playerModels.get(otherPlayer).getHand().size(),
+                playerModels.get(otherPlayer).getFaceUpCastleCards().copy(),
+                playerModels.get(otherPlayer).getFaceDownCastleCards().size(),
                 discardPile.getTopCard(),
                 deck.isEmpty());
     }
@@ -130,16 +130,16 @@ public class GameState {
     public INDArray toNDArray(int povPlayer) {
         int otherPlayer = 1 - povPlayer;
 
-        INDArray array = Nd4j.hstack(players.get(povPlayer).getHand().toNDArray(), players.get(povPlayer).getFaceUpCastleCards().toNDArray());
-        array = Nd4j.hstack(array, players.get(otherPlayer).getFaceUpCastleCards().toNDArray());
+        INDArray array = Nd4j.hstack(playerModels.get(povPlayer).getHand().toNDArray(), playerModels.get(povPlayer).getFaceUpCastleCards().toNDArray());
+        array = Nd4j.hstack(array, playerModels.get(otherPlayer).getFaceUpCastleCards().toNDArray());
 
         INDArray zeros = Nd4j.zeros(new int[]{4, 2});
         array = Nd4j.hstack(array, zeros);
 
-        for (int i = 0; i < players.get(otherPlayer).getHand().size(); i++) {
+        for (int i = 0; i < playerModels.get(otherPlayer).getHand().size(); i++) {
             array.putScalar(0, 39, 1);
         }
-        for (int i = 0; i < players.get(otherPlayer).getFaceDownCastleCards().size(); i++) {
+        for (int i = 0; i < playerModels.get(otherPlayer).getFaceDownCastleCards().size(); i++) {
             array.putScalar(0, 40, 1);
         }
 
@@ -158,7 +158,7 @@ public class GameState {
             }
         }
 
-        for (Player player : players) {
+        for (PlayerModel player : playerModels) {
             player.getHand().updateCount(counts);
             player.getFaceDownCastleCards().updateCount(counts);
             player.getFaceUpCastleCards().updateCount(counts);
@@ -178,9 +178,9 @@ public class GameState {
         return new GameState(new Deck(deck), new DiscardPile(discardPile), new ArrayList<>(burnedCards), copyPlayers(), currentPlayer, handSize, castleSize, noOfPlayers, gameOver, lastMove, winningPlayer);
     }
 
-    private List<Player> copyPlayers() {
-        List<Player> playersCopy = new ArrayList<>();
-        for (Player player : players) {
+    private List<PlayerModel> copyPlayers() {
+        List<PlayerModel> playersCopy = new ArrayList<>();
+        for (PlayerModel player : playerModels) {
             playersCopy.add(player.copy());
         }
         return playersCopy;
@@ -189,7 +189,7 @@ public class GameState {
     public GameState(Deck deck,
                      DiscardPile discardPile,
                      List<Card> burnedCards,
-                     List<Player> players,
+                     List<PlayerModel> playerModels,
                      int currentPlayer,
                      int handSize,
                      int castleSize,
@@ -200,7 +200,7 @@ public class GameState {
         this.deck = deck;
         this.discardPile = discardPile;
         this.burnedCards = burnedCards;
-        this.players = players;
+        this.playerModels = playerModels;
         this.currentPlayer = currentPlayer;
         this.handSize = handSize;
         this.castleSize = castleSize;

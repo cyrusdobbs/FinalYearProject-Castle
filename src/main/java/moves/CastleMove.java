@@ -42,4 +42,6 @@ public abstract class CastleMove {
     public abstract void doMove(GameState gameState);
 
     public abstract String toString();
+
+    public abstract String toHumanString();
 }

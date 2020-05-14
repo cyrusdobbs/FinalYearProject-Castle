@@ -18,20 +18,17 @@ public class PlayFaceDownCastleCard extends PlayCard {
 
     @Override
     public void doMove(GameState gameState) {
-        // If model.cards.card is valid it is played
-        if (gameState.getPlayers().get(player).getFaceDownCastleCards().getCardCollection().isEmpty()) {
-            int stop = 1;
-        }
-        Card cardPicked = gameState.getPlayers().get(player).getFaceDownCastleCards().getCardCollection().get(cardPickedIndex);
+        // If card is valid it is played
+        Card cardPicked = gameState.getPlayerModels().get(player).getFaceDownCastleCards().getCardCollection().get(cardPickedIndex);
         cards.add(cardPicked);
         if (cardPicked.isCardValid(gameState.getDiscardPile().getTopCard())) {
-            gameState.getPlayers().get(player).getFaceDownCastleCards().removeCards(cards);
+            gameState.getPlayerModels().get(player).getFaceDownCastleCards().removeCards(cards);
             super.doMove(gameState);
         }
         // Otherwise pick up pile
         else {
-            gameState.getPlayers().get(player).getFaceDownCastleCards().removeCards(cards);
-            gameState.getPlayers().get(player).getHand().addCards(cards);
+            gameState.getPlayerModels().get(player).getFaceDownCastleCards().removeCards(cards);
+            gameState.getPlayerModels().get(player).getHand().addCards(cards);
             PickUp pickUp = new PickUp(player);
             pickUp.doMove(gameState);
             triedToPlay = true;
@@ -42,8 +39,13 @@ public class PlayFaceDownCastleCard extends PlayCard {
     @Override
     public String toString() {
         if (triedToPlay) {
-            return "Player" + player + " tried to play " + cards.get(0).toShortString() + " from FDCastle." + "\n" + pickedUpString;
+            return "Player" + (player + 1) + " tried to play " + cards.get(0).toShortString() + " from FDCastle." + "\n" + pickedUpString;
         }
         return super.toString() + "FDCastle" + (burnsPile ? " and BURNED the pile." : ".");
+    }
+
+    @Override
+    public String toHumanString() {
+        return super.toHumanString() + "FDCastle.";
     }
 }

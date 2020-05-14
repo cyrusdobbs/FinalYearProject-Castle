@@ -2,16 +2,16 @@ package controller.players;
 
 import moves.*;
 import model.GameState;
-import model.Player;
+import model.PlayerModel;
 import model.cards.card.Card;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class LowestPlayerController extends PlayerController implements AIController {
+public class LowestPlayerController extends PlayerController {
 
-    public LowestPlayerController(Player playerModel, int playerNo) {
+    public LowestPlayerController(PlayerModel playerModel, int playerNo) {
         super(playerModel, playerNo);
     }
 
@@ -26,6 +26,11 @@ public class LowestPlayerController extends PlayerController implements AIContro
         } else {
             return pickFDCastleCardToPlay(gameState);
         }
+    }
+
+    @Override
+    public PlayerController copy() {
+        return new LowestPlayerController(this.playerModel.copy(), playerNo);
     }
 
     private CastleMove pickCardToPlay(GameState gameState) {

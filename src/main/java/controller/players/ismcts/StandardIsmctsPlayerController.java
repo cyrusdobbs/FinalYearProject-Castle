@@ -1,11 +1,12 @@
 package controller.players.ismcts;
 
+import controller.players.PlayerController;
 import model.GameState;
-import model.Player;
+import model.PlayerModel;
 
 public class StandardIsmctsPlayerController extends IsmctsPlayerController {
 
-    public StandardIsmctsPlayerController(Player playerModel, int playerNo, int maxIterations, boolean verbose, boolean print) {
+    public StandardIsmctsPlayerController(PlayerModel playerModel, int playerNo, int maxIterations, boolean verbose, boolean print) {
         super(playerModel, playerNo, maxIterations, verbose, print);
     }
 
@@ -19,5 +20,10 @@ public class StandardIsmctsPlayerController extends IsmctsPlayerController {
     @Override
     protected int getWinningPlayer(GameState currentGameState) {
         return currentGameState.getWinningPlayer();
+    }
+
+    @Override
+    public PlayerController copy() {
+        return new StandardIsmctsPlayerController(playerModel.copy(), playerNo, maxIterations, verbose, print);
     }
 }

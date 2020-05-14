@@ -17,11 +17,9 @@ import java.util.List;
 
 class CSVExporter {
 
-    // 2500 is for ~35 minutes of games at 3200 MCTS iterations
     private static final int ENTRIES_PER_FILE = 2500;
     private static final String OUTPUT_FOLDER = "output/";
     private static final String[] HEADER = {"HAND", "CASTLE_FU", "CASTLE_FD_SIZE", "OP_HAND_SIZE", "OP_CASTLE_FU", "OP_CASTLE_FD_SIZE", "TOP", "DECK_EMPTY", "WON"};
-    private static final String NA = "NA";
     private static final String SUMMARY_FILE_NAME = "Summary";
     private static final String CSV_EXT = ".csv";
 
@@ -76,7 +74,9 @@ class CSVExporter {
     }
 
     void close() throws IOException {
-        csvWriter.close();
+        if (csvWriter != null) {
+            csvWriter.close();
+        }
     }
 
     private String[] gameStateToEntry(SimpleGameState gameState, boolean won) {

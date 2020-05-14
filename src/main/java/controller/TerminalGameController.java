@@ -1,28 +1,24 @@
 package controller;
 
-import model.cards.DiscardPile;
-import util.CastleConstants;
-import controller.players.AIController;
+import controller.players.PlayerController;
 import model.GameHistory;
 import model.SimpleGameState;
 import moves.*;
 import model.GameState;
-import util.Run;
-import view.TextGameView;
+import view.GameView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TerminalGameController {
 
     private GameState gameState;
-    private TextGameView gameView;
+    private GameView gameView;
 
-    private List<AIController> players;
+    private List<PlayerController> players;
     private int trackedPlayer;
 
-    public TerminalGameController(GameState gameState, TextGameView gameView, List<AIController> players, int trackedPlayer) {
+    public TerminalGameController(GameState gameState, GameView gameView, List<PlayerController> players, int trackedPlayer) {
         this.gameState = gameState;
         this.gameView = gameView;
         this.players = players;
@@ -31,9 +27,10 @@ public class TerminalGameController {
 
     public GameHistory run(boolean print) {
         List<SimpleGameState> gameStates = new ArrayList<>();
+        gameView.startView(gameState);
         do {
 
-            for (AIController player : players) {
+            for (PlayerController player : players) {
                 while (true) {
 
                     // Snapshot GameState at the beginning of every AI turn

@@ -11,11 +11,16 @@ public class PickUp extends CastleMove {
     @Override
     public void doMove(GameState gameState) {
         // Pick up discard pile
-        gameState.getPlayers().get(player).getHand().addCards(gameState.getDiscardPile().pickUp());
+        gameState.getPlayerModels().get(player).getHand().addCards(gameState.getDiscardPile().pickUp());
     }
 
     @Override
     public String toString() {
-        return "Player" + player + " could not play and PICKED UP the pile.";
+        return "Player" + (player + 1) + " could not play and PICKED UP the pile.";
+    }
+
+    @Override
+    public String toHumanString() {
+        return "You cannot play anything. Pick up the pile.";
     }
 }

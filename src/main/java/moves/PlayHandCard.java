@@ -15,12 +15,12 @@ public class PlayHandCard extends PlayCard {
 
     @Override
     public void doMove(GameState gameState) {
-        // Remove model.cards.card from hand
-        gameState.getPlayers().get(player).getHand().removeCards(cards);
-        // Play model.cards.card
+        // Remove card from hand
+        gameState.getPlayerModels().get(player).getHand().removeCards(cards);
+        // Play card
         super.doMove(gameState);
         // Take top deck
-        if (!gameState.getDeck().isEmpty() && gameState.getPlayers().get(player).getHand().size() < gameState.getHandSize()) {
+        if (!gameState.getDeck().isEmpty() && gameState.getPlayerModels().get(player).getHand().size() < gameState.getHandSize()) {
             pickUpTopDeck(gameState);
         }
     }
@@ -28,9 +28,9 @@ public class PlayHandCard extends PlayCard {
     private void pickUpTopDeck(GameState gameState) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(" and TOP DECKED ");
-        while (!gameState.getDeck().isEmpty() && gameState.getPlayers().get(player).getHand().size() < gameState.getHandSize()) {
+        while (!gameState.getDeck().isEmpty() && gameState.getPlayerModels().get(player).getHand().size() < gameState.getHandSize()) {
             Card topDeckCard = gameState.getDeck().topDeck();
-            gameState.getPlayers().get(player).getHand().addCard(topDeckCard);
+            gameState.getPlayerModels().get(player).getHand().addCard(topDeckCard);
             stringBuilder.append(topDeckCard.toShortString()).append(", ");
         }
         topDeckString = stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length()).toString();
@@ -39,5 +39,10 @@ public class PlayHandCard extends PlayCard {
     @Override
     public String toString() {
         return super.toString() + "HAND" + topDeckString + (burnsPile ? " and BURNED the pile." : ".");
+    }
+
+    @Override
+    public String toHumanString() {
+        return super.toHumanString() + "hand.";
     }
 }

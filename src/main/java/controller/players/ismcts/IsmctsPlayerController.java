@@ -1,38 +1,34 @@
 package controller.players.ismcts;
 
-import controller.players.AIController;
 import controller.players.PlayerController;
 import moves.*;
 import model.cards.Deck;
 import model.cards.card.Card;
 import model.GameState;
-import model.Player;
-import org.apache.commons.math3.util.CombinatoricsUtils;
+import model.PlayerModel;
 
 import java.util.*;
 
-public abstract class IsmctsPlayerController extends PlayerController implements AIController {
+public abstract class IsmctsPlayerController extends PlayerController {
 
-    private int maxIterations;
+    protected int maxIterations;
     private double exploration;
-    private boolean verbose;
-    private Random random;
-    private boolean print;
+    protected boolean verbose;
+    protected boolean print;
 
-    public IsmctsPlayerController(Player playerModel, int playerNo, int maxIterations, boolean verbose, boolean print) {
+    public IsmctsPlayerController(PlayerModel playerModel, int playerNo, int maxIterations, boolean verbose, boolean print) {
         super(playerModel, playerNo);
         this.maxIterations = maxIterations;
         exploration = 0.7;
         this.verbose = verbose;
-        random = new Random();
         this.print = print;
     }
 
     @Override
     public CastleMove getMove(GameState gameState) {
         // This decision is entirely random in all scenarios, therefor hardcoded.
-        if (gameState.getPlayers().get(gameState.getCurrentPlayer()).getHand().isEmpty()
-                && gameState.getPlayers().get(gameState.getCurrentPlayer()).getFaceUpCastleCards().isEmpty()) {
+        if (gameState.getPlayerModels().get(gameState.getCurrentPlayer()).getHand().isEmpty()
+                && gameState.getPlayerModels().get(gameState.getCurrentPlayer()).getFaceUpCastleCards().isEmpty()) {
             return new PlayFaceDownCastleCard(gameState.getCurrentPlayer(), 0);
         }
 
@@ -43,14 +39,16 @@ public abstract class IsmctsPlayerController extends PlayerController implements
             // Determinise
             GameState currentGameState = cloneAndRandomize(gameState);
 
-            // Select
+            // Selection
             List<CastleMove> availableMovesForSelection = getMoves(currentGameState);
-            while (!availableMovesForSelection.isEmpty() && node.getUntriedMoves(availableMovesForSelection).isEmpty()) {
+            while (!availableMovesForSelection.isEmpty()
+                    && node.getUntriedMoves(availableMovesForSelection).isEmpty()) {
+
                 node = node.UCBSelectChild(availableMovesForSelection, exploration);
                 doMove(node.getMove(), currentGameState);
             }
 
-            // Expand
+            // Expansion
             List<CastleMove> availableMovesForExpansion = getMoves(currentGameState);
             if (!node.getUntriedMoves(availableMovesForExpansion).isEmpty()) {
                 CastleMove move = getRandomMove(node.getUntriedMoves(availableMovesForExpansion));
@@ -59,14 +57,23 @@ public abstract class IsmctsPlayerController extends PlayerController implements
                 node.addChild(move, player);
             }
 
+            // Simulation
             simulate(currentGameState);
 
+            // Backpropagation
             while (node != null) {
                 node.update(getWinningPlayer(currentGameState));
                 node = node.getParentNode();
             }
         }
 
+        printTree(rootNode);
+
+        CastleMove bestMoveFound = rootNode.getChildNodes().stream().max(Comparator.comparing(Node::getWins)).get().getMove();
+        return bestMoveFound != null ? bestMoveFound : rootNode.getChildNodes().get(random.nextInt(rootNode.getChildNodes().size())).getMove();
+    }
+
+    private void printTree(Node rootNode) {
         if (print) {
             if (verbose) {
                 System.out.println(rootNode.treeToString(0));
@@ -74,9 +81,6 @@ public abstract class IsmctsPlayerController extends PlayerController implements
                 System.out.println(rootNode.childrenToString());
             }
         }
-
-        CastleMove bestMoveFound = rootNode.getChildNodes().stream().max(Comparator.comparing(Node::getWins)).get().getMove();
-        return bestMoveFound != null ? bestMoveFound : rootNode.getChildNodes().get(random.nextInt(rootNode.getChildNodes().size())).getMove();
     }
 
     protected abstract void simulate(GameState currentGameState);
@@ -107,8 +111,8 @@ public abstract class IsmctsPlayerController extends PlayerController implements
 
         Collections.shuffle(unseenCards);
         copiedState.getDeck().replaceWithUnseenCards(unseenCards);
-        for (int playerNo = 0; playerNo < copiedState.getPlayers().size(); playerNo++) {
-            Player player = copiedState.getPlayers().get(playerNo);
+        for (int playerNo = 0; playerNo < copiedState.getPlayerModels().size(); playerNo++) {
+            PlayerModel player = copiedState.getPlayerModels().get(playerNo);
             if (playerNo != observingPlayer) {
                 player.getHand().replaceWithUnseenCards(unseenCards);
             }
@@ -136,11 +140,11 @@ public abstract class IsmctsPlayerController extends PlayerController implements
     }
 
     private List<Card> getObservedCards(GameState gameState) {
-        List<Player> players = gameState.getPlayers();
+        List<PlayerModel> players = gameState.getPlayerModels();
         // Add observing players hand
         List<Card> observedCards = new ArrayList<>(players.get(gameState.getCurrentPlayer()).getHand().getCardCollection());
         // Add each players face up castle cards
-        for (Player player : players) {
+        for (PlayerModel player : players) {
             observedCards.addAll(player.getFaceUpCastleCards().getCardCollection());
         }
         // Player can see what cards have been discarded (all for now)
@@ -148,67 +152,5 @@ public abstract class IsmctsPlayerController extends PlayerController implements
         observedCards.addAll(gameState.getDiscardPile().getPlayedPile());
         observedCards.addAll(gameState.getBurnedCards());
         return observedCards;
-    }
-
-    protected List<CastleMove> getMoves(GameState gameState) {
-        Player playerHasGo = gameState.getPlayers().get(gameState.getCurrentPlayer());
-        if (!playerHasGo.hasPickedCastle()) {
-            return getPickCastleMoves(playerHasGo, gameState);
-        } else if (!playerHasGo.getHand().isEmpty()) {
-            return getPickCardToPlayMoves(playerHasGo, gameState);
-        } else if (!playerHasGo.getFaceUpCastleCards().isEmpty()) {
-            return getPickFUCastleCardToPlayMoves(playerHasGo, gameState);
-        } else if (!playerHasGo.getFaceDownCastleCards().isEmpty()) {
-            return getPickFDCastleCardToPlayMoves(playerHasGo, gameState);
-        }
-        return new ArrayList<>();
-    }
-
-    private List<CastleMove> getPickCastleMoves(Player player, GameState gameState) {
-        List<CastleMove> pickCastleMoves = new ArrayList<>();
-
-        Iterator<int[]> cardCombinations = CombinatoricsUtils.combinationsIterator(player.getHand().size(), gameState.getCastleSize());
-        while (cardCombinations.hasNext()) {
-            int[] cardCombination = cardCombinations.next();
-            List<Card> faceUpCastleCards = new ArrayList<>();
-            for (int cardIndex : cardCombination) {
-                faceUpCastleCards.add(player.getHand().getCardCollection().get(cardIndex));
-            }
-            pickCastleMoves.add(new PickCastle(gameState.getCurrentPlayer(), faceUpCastleCards));
-        }
-        return pickCastleMoves;
-    }
-
-    private List<CastleMove> getPickCardToPlayMoves(Player player, GameState gameState) {
-        List<CastleMove> playHandCardMoves = new ArrayList<>();
-
-        Map<String, List<Card>> legalCards = player.getHand().getLegalCardsGrouped(gameState.getDiscardPile().getTopCard());
-        for (List<Card> groupOfLegalCards : legalCards.values()) {
-            playHandCardMoves.add(new PlayHandCard(gameState.getCurrentPlayer(), groupOfLegalCards));
-        }
-        return playHandCardMoves.isEmpty() ? Collections.singletonList(new PickUp(gameState.getCurrentPlayer())) : playHandCardMoves;
-    }
-
-    private List<CastleMove> getPickFUCastleCardToPlayMoves(Player player, GameState gameState) {
-        List<CastleMove> playFUCastleCardMoves = new ArrayList<>();
-
-        Map<String, List<Card>> legalCards = player.getFaceUpCastleCards().getLegalCardsGrouped(gameState.getDiscardPile().getTopCard());
-        for (List<Card> groupOfLegalCards : legalCards.values()) {
-            playFUCastleCardMoves.add(new PlayFaceUpCastleCard(gameState.getCurrentPlayer(), groupOfLegalCards));
-        }
-        return playFUCastleCardMoves.isEmpty() ? Collections.singletonList(new PickUp(gameState.getCurrentPlayer())) : playFUCastleCardMoves;
-    }
-
-    private List<CastleMove> getPickFDCastleCardToPlayMoves(Player player, GameState gameState) {
-        List<CastleMove> playFDCastleCardMoves = new ArrayList<>();
-
-        for (int i = 0; i < player.getFaceDownCastleCards().size(); i++) {
-            playFDCastleCardMoves.add(new PlayFaceDownCastleCard(gameState.getCurrentPlayer(), i));
-        }
-        return playFDCastleCardMoves;
-    }
-
-    protected CastleMove getRandomMove(List<CastleMove> moves) {
-        return moves.get(random.nextInt(moves.size()));
     }
 }

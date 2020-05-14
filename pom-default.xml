@@ -53,9 +53,16 @@
       <version>${nd4j.version}</version>
       <scope>compile</scope>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.nd4j</groupId>-->
+<!--      <artifactId>nd4j-cuda-10.2-platform</artifactId>-->
+<!--      <version>${nd4j.version}</version>-->
+<!--      <scope>compile</scope>-->
+<!--    </dependency>-->
+    <!-- https://mvnrepository.com/artifact/org.nd4j/nd4j-native -->
     <dependency>
       <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-cuda-10.2-platform</artifactId>
+      <artifactId>nd4j-native-platform</artifactId>
       <version>${nd4j.version}</version>
       <scope>compile</scope>
     </dependency>
@@ -69,6 +76,12 @@
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-nop -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.25</version>
     </dependency>
   </dependencies>
   <build>

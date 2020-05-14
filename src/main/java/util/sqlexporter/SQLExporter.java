@@ -61,7 +61,6 @@ public class SQLExporter {
             rs = stmt.getResultSet();
         }
 
-        // Now do something with the ResultSet ....
         while (rs.next()) {
             int totalGames = rs.getInt("TOTAL_GAMES");
             int aiWins = rs.getInt("AI_WINS");
@@ -70,10 +69,6 @@ public class SQLExporter {
             return new int[]{totalGames, aiWins, lowestWins};
         }
 
-        // it is a good idea to release
-        // resources in a finally{} block
-        // in reverse-order of their creation
-        // if they are no-longer needed
         try {
             rs.close();
         } catch (SQLException sqlEx) { /* ignore */ }

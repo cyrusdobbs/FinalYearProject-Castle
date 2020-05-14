@@ -49,14 +49,6 @@ public class Deck {
         return deck.empty();
     }
 
-    public int cardsLeft() {
-        return deck.size();
-    }
-
-    public boolean isShuffled() {
-        return isShuffled;
-    }
-
     public Stack<Card> getDeck() {
         return deck;
     }

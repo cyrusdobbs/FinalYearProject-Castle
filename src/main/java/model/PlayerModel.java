@@ -4,7 +4,7 @@ import model.cards.FaceDownCastleCards;
 import model.cards.FaceUpCastleCards;
 import model.cards.Hand;
 
-public class Player {
+public class PlayerModel {
 
     private Hand hand;
     private FaceUpCastleCards faceUpCastleCards;
@@ -12,7 +12,7 @@ public class Player {
     private String name;
     private boolean hasPickedCastle;
 
-    public Player(String name) {
+    public PlayerModel(String name) {
         hand = new Hand();
         faceUpCastleCards = new FaceUpCastleCards();
         faceDownCastleCards = new FaceDownCastleCards();
@@ -20,7 +20,7 @@ public class Player {
         this.name = name;
     }
 
-    protected Player(Hand hand, FaceUpCastleCards faceUpCastleCards, FaceDownCastleCards faceDownCastleCards, String name, boolean hasPickedCastle) {
+    protected PlayerModel(Hand hand, FaceUpCastleCards faceUpCastleCards, FaceDownCastleCards faceDownCastleCards, String name, boolean hasPickedCastle) {
         this.hand = hand;
         this.faceUpCastleCards = faceUpCastleCards;
         this.faceDownCastleCards = faceDownCastleCards;
@@ -52,7 +52,7 @@ public class Player {
         this.hasPickedCastle = hasPickedCastle;
     }
 
-    public Player copy() {
-        return new Player(getHand().copy(), getFaceUpCastleCards().copy(), getFaceDownCastleCards().copy(), getName(), hasPickedCastle());
+    public PlayerModel copy() {
+        return new PlayerModel(getHand().copy(), getFaceUpCastleCards().copy(), getFaceDownCastleCards().copy(), getName(), hasPickedCastle());
     }
 }
